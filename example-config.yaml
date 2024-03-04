@@ -1,0 +1,11 @@
+# GoWAFer 配置文件
+
+# server 配置
+server:
+  port: 8080  # waf运行端口
+  rootPath: "/waf" # waf API、页面根路由
+
+# jwt 配置
+jwt:
+  secretKey: "sdamdadllamdlsbusjadjnkadsao"
+
