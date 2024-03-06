@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>{{.pageTitle}}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <link rel="shortcut icon" href="/static/img/favicon.ico"/>
+    <link rel="stylesheet" title="default" href="/static/sdk/sdk.css"/>
+    <link rel="stylesheet" href="/static/sdk/helper.css"/>
+    <link rel="stylesheet" href="/static/sdk/iconfont.css"/>
+    <style>
+        html,
+        body,
+        .app-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="root" class="app-wrapper"></div>
+<script type="text/javascript" src="/static/sdk/sdk.js"></script>
+<script>
+    (function () {
+        let amis = amisRequire('amis/embed');
+
+
+        var data = {
+            "type": "page",
+            "body": {
+                "type": "container",
+                "style": {
+                    "display": "flex",
+                    "justifyContent": "center",
+                    "alignItems": "center",
+                    "height": "100vh"
+                },
+                "body": {
+                    "type": "form",
+                    "initApi": "get:/waf/api/v1/auth/getCaptcha",
+                    "id":"form-test",
+                    "title": "GoWAFer后台登录",
+                    "api": {
+                        "url": "/waf/api/v1/auth/dologin",
+                        "method": "post",
+                    },
+                    "body": [
+                        {
+                            "label": "用户名",
+                            "type": "input-text",
+                            "name": "username",
+                            "required": true
+                        },
+                        {
+                            "label": "密码",
+                            "type": "input-password",
+                            "name": "password",
+                            "required": true
+                        },
+                        {
+                            "type": "group",
+                            "body": [
+                                {
+                                    "type": "input-text",
+                                    "name": "captcha",
+                                    "label": "图像验证码",
+                                    "required": true,
+                                },
+                                {
+                                    "name":"aaa",
+                                    "type": "image",
+                                    "src": "${bs6}",
+                                    "height": "40px",
+                                },
+                                {
+                                    "type": "button",
+                                    "actionType": "ajax",
+                                    "api": {
+                                        "url": "/waf/api/v1/auth/getCaptcha",
+                                        "method": "get",
+                                        "silent": true,
+                                    },
+                                    "level": "link",
+                                    "icon": "fa fa-refresh",
+                                }
+                            ]
+                        },
+                        {
+                            "type": "hidden",
+                            "name": "captchaId",
+                            "value": "${id}",
+                        },
+                    ],
+                    "onEvent": {
+                        "submitFail": {
+                            "actions": [
+                                {
+                                    "componentId": "form-test",
+                                    "actionType": "reload",
+                                },
+                            ]
+                        }
+                    },
+                    "actions": [
+                        {
+                            "type": "submit",
+                            "label": "登录",
+                            "primary": true
+                        }
+                    ],
+                    "style": {
+                        "width": "400px",
+                        "padding": "20px",
+                        "boxShadow": "0 4px 8px rgba(0, 0, 0, 0.1)",
+                        "borderRadius": "8px",
+                        "background": "#fff",
+                        "textAlign": "left"
+                    }
+                }
+            }
+        }
+
+
+        amis.embed('#root', data, {});
+
+    })();
+</script>
+</body>
+</html>

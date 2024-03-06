@@ -30,14 +30,14 @@ func NewUserController(userService *service.UserService, conf *config.Config) *U
 }
 
 // DoLogin godoc
-// @Summary DoLogin
+// @Summary 处理登录
 // @Description dologin
 // @Tags Auth
 // @Accept json
 // @Produce json
 // @Param LoginRequest body LoginRequest true "request body"
 // @Success 200 {object} api_handler.Response
-// @Router /api/v1/auth/dologin [post]
+// @Router /waf/api/v1/auth/dologin [post]
 func (c *UserController) DoLogin(g *gin.Context) {
 	var req LoginRequest
 	if err := g.ShouldBindJSON(&req); err != nil {
@@ -108,4 +108,21 @@ func (c *UserController) DoLogin(g *gin.Context) {
 
 	// 登录成功，成功响应
 	g.JSON(http.StatusOK, api_handler.Response{Status: 0, Message: "success"})
+}
+
+// GetCaptcha godoc
+// @Summary 获取图片验证码
+// @Description 获取图片验证码
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} api_handler.Response
+// @Router /waf/api/v1/auth/getCaptcha [get]
+func (c *UserController) GetCaptcha(g *gin.Context) {
+	captchaID, captchaBs6, err := captcha_handler.GenerateCaptcha()
+	if err != nil {
+		api_handler.InternalErrorHandler(g, err)
+		return
+	}
+	g.JSON(http.StatusOK, api_handler.Response{Status: 0, Message: "success", Data: map[string]string{"id": captchaID, "bs6": captchaBs6}})
 }

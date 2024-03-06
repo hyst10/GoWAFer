@@ -31,7 +31,7 @@ info:
   title: GoWAFer
   version: v0.1
 paths:
-  /api/v1/auth/dologin:
+  /waf/api/v1/auth/dologin:
     post:
       consumes:
       - application/json
@@ -50,7 +50,22 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api_handler.Response'
-      summary: DoLogin
+      summary: 处理登录
+      tags:
+      - Auth
+  /waf/api/v1/auth/getCaptcha:
+    get:
+      consumes:
+      - application/json
+      description: 获取图片验证码
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 获取图片验证码
       tags:
       - Auth
 swagger: "2.0"

@@ -8,8 +8,7 @@ import (
 // Config 配置文件结构
 type Config struct {
 	Server struct {
-		Port     int    `mapstructure:"port"`
-		RootPath string `mapstructure:"rootPath"`
+		Port int `mapstructure:"port"`
 	} `mapstructure:"server"`
 
 	Jwt struct {

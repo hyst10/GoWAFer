@@ -25,7 +25,7 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/auth/dologin": {
+        "/waf/api/v1/auth/dologin": {
             "post": {
                 "description": "dologin",
                 "consumes": [
@@ -37,7 +37,7 @@ var doc = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "DoLogin",
+                "summary": "处理登录",
                 "parameters": [
                     {
                         "description": "request body",
@@ -49,6 +49,29 @@ var doc = `{
                         }
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/waf/api/v1/auth/getCaptcha": {
+            "get": {
+                "description": "获取图片验证码",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "获取图片验证码",
                 "responses": {
                     "200": {
                         "description": "OK",

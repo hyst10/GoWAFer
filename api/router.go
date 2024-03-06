@@ -5,7 +5,6 @@ import (
 	"GoWAFer/internal/repository"
 	"GoWAFer/internal/service"
 	"GoWAFer/pkg/config"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -22,7 +21,7 @@ func NewDatabases(db *gorm.DB) *Databases {
 
 func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, conf *config.Config) {
 	dbs := NewDatabases(db)
-	apiGroup := r.Group(fmt.Sprintf("%s/api/v1", conf.Server.RootPath))
+	apiGroup := r.Group("/waf/api/v1")
 	RegisterUserHandler(apiGroup, dbs, conf)
 
 }
@@ -32,4 +31,5 @@ func RegisterUserHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config
 	userController := controller.NewUserController(userService, conf)
 	authGroup := r.Group("/auth")
 	authGroup.POST("/dologin", userController.DoLogin)
+	authGroup.GET("/getCaptcha", userController.GetCaptcha)
 }
