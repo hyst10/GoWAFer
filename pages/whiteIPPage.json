@@ -1,0 +1,163 @@
+{
+  "type": "page",
+  "title": "IP白名单管理",
+  "toolbar": [
+    {
+      "type": "button",
+      "actionType": "dialog",
+      "label": "新增",
+      "icon": "fa fa-plus pull-left",
+      "primary": true,
+      "dialog": {
+        "title": "新增白名单IP",
+        "body": {
+          "type": "form",
+          "api": "post:/waf/api/v1/ip",
+          "body": [
+            {
+              "type": "input-text",
+              "name": "ip-address",
+              "label": "IP",
+              "required": true
+            },
+            {
+              "type": "hidden",
+              "name": "type",
+              "value": 1,
+              "required": true
+            },
+            {
+              "type": "input-datetime",
+              "name": "expirationAt",
+              "label": "过期时间",
+              "required": true
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "body": [
+    {
+      "type": "crud",
+      "api": "/waf/api/v1/ip?page=${page}&perPage=${perPage}&keywords=${keywords}&type=1",
+      "defaultParams": {
+        "perPage": 10
+      },
+      "headerToolbar": [
+        "statistics",
+        "switch-per-page",
+        "export-excel",
+        {
+          "type": "pagination",
+          "align": "right"
+        }
+      ],
+      "footerToolbar": [
+        "statistics",
+        "switch-per-page",
+        "pagination"
+      ],
+      "syncLocation": false,
+      "filter": {
+        "title": "条件搜索",
+        "body": [
+          {
+            "type": "group",
+            "body": [
+              {
+                "type": "input-text",
+                "name": "keywords",
+                "label": "IP",
+                "clearable": true,
+                "placeholder": "通过IP搜索",
+                "size": "sm"
+              }
+            ]
+          }
+        ],
+        "actions": [
+          {
+            "type": "reset",
+            "label": "重置"
+          },
+          {
+            "type": "submit",
+            "level": "primary",
+            "label": "查询"
+          }
+        ]
+      },
+      "tableLayout": "fixed",
+      "columns": [
+        {
+          "label": "ID",
+          "name": "id",
+          "width": 70
+        },
+        {
+          "label": "IP",
+          "name": "ip_address",
+          "width": 50
+        },
+        {
+          "label": "添加时间",
+          "name": "created_at",
+          "type": "date",
+          "format": "YYYY年MM月DD日 HH时mm分ss秒",
+          "width": 50
+        },
+        {
+          "label": "过期时间",
+          "name": "expiration_at",
+          "type": "date",
+          "format": "YYYY年MM月DD日 HH时mm分ss秒",
+          "width": 50
+        },
+        {
+          "type": "operation",
+          "label": "操作",
+          "fixed": "right",
+          "width": 100,
+          "buttons": [
+            {
+              "type": "button",
+              "icon": "fa fa-pencil",
+              "tooltip": "编辑",
+              "actionType": "dialog",
+              "dialog": {
+                "title": "编辑",
+                "body": {
+                  "type": "form",
+                  "api": "patch:/waf/api/v1/ip/$id",
+                  "body": [
+                    {
+                      "type": "input-text",
+                      "name": "ip_address",
+                      "label": "IP",
+                      "required": true
+                    },
+                    {
+                      "type": "input-datetime",
+                      "name": "expiration_at",
+                      "label": "过期时间",
+                      "required": true
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "button",
+              "icon": "fa fa-times text-danger",
+              "actionType": "ajax",
+              "tooltip": "删除",
+              "confirmText": "确认要删除?",
+              "api": "delete:/waf/api/v1/ip/$id"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

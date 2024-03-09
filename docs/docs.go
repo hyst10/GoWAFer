@@ -40,12 +40,12 @@ var doc = `{
                 "summary": "处理登录",
                 "parameters": [
                     {
-                        "description": "request body",
-                        "name": "LoginRequest",
+                        "description": "请求体",
+                        "name": "api_handler.LoginRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controller.LoginRequest"
+                            "$ref": "#/definitions/api_handler.LoginRequest"
                         }
                     }
                 ],
@@ -81,9 +81,190 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/waf/api/v1/ip": {
+            "get": {
+                "description": "分页查询IP",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IP"
+                ],
+                "summary": "分页查询IP",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "查询IP",
+                        "name": "keywords",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "IP类型",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页面大小",
+                        "name": "perPage",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "新增IP记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IP"
+                ],
+                "summary": "新增IP记录",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "api_handler.CreateIPRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.CreateIPRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/waf/api/v1/ip/{id}": {
+            "delete": {
+                "description": "删除IP",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IP"
+                ],
+                "summary": "删除IP",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "IP主键ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "编辑IP",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IP"
+                ],
+                "summary": "编辑IP",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "IP主键ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "api_handler.UpdateIPRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.UpdateIPRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "api_handler.CreateIPRequest": {
+            "type": "object",
+            "required": [
+                "ip-address"
+            ],
+            "properties": {
+                "expirationAt": {
+                    "type": "string"
+                },
+                "ip-address": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "api_handler.LoginRequest": {
+            "type": "object",
+            "required": [
+                "captcha",
+                "captchaId",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "captcha": {
+                    "type": "string"
+                },
+                "captchaId": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "api_handler.Response": {
             "type": "object",
             "properties": {
@@ -98,25 +279,16 @@ var doc = `{
                 }
             }
         },
-        "controller.LoginRequest": {
+        "api_handler.UpdateIPRequest": {
             "type": "object",
             "required": [
-                "captcha",
-                "captchaID",
-                "password",
-                "username"
+                "ip-address"
             ],
             "properties": {
-                "captcha": {
+                "expirationAt": {
                     "type": "string"
                 },
-                "captchaID": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "username": {
+                "ip-address": {
                     "type": "string"
                 }
             }

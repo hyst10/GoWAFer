@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // Response 通用响应结构
@@ -26,4 +27,15 @@ func InternalErrorHandler(c *gin.Context, err error) {
 	c.JSON(http.StatusOK, Response{Status: 500, Message: "服务器异常，请稍后再试！"})
 	c.Abort()
 	return
+}
+
+// GetUintParamFromPath 获取某个路由参数上的值并返回uint类型
+func GetUintParamFromPath(c *gin.Context, param string) (uint, error) {
+	param = c.Param(param)
+	// 转换为uint类型
+	paramUint, err := strconv.ParseUint(param, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return uint(paramUint), nil
 }

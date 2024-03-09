@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <title>GoWAFer</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <link rel="shortcut icon" href="/static/img/favicon.ico"/>
+    <link rel="stylesheet" title="default" href="/static/sdk/sdk.css"/>
+    <link rel="stylesheet" href="/static/sdk/helper.css"/>
+    <link rel="stylesheet" href="/static/sdk/iconfont.css"/>
+    <style>
+        html,
+        body,
+        .app-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="root" class="app-wrapper"></div>
+<script type="text/javascript" src="/static/sdk/sdk.js"></script>
+<script>
+    (function () {
+        let amis = amisRequire('amis/embed');
+
+
+        var data = {
+            "type": "app",
+            "brandName": "GoWAFer",
+            "logo": "/static/img/favicon.ico",
+            "asideBefore": "\u003cdiv class=\"p-0.5 text-center\"\u003e\u003c/div\u003e",
+            "pages": [
+                {
+                    "children": [
+                        {
+                            "label": "Dashboard",
+                            "url": "/",
+                            "schemaApi": "/pages/app-index",
+                            "icon": "fa fa-address-book"
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "IP黑白名单",
+                            "url": "/waf/app/menu/ip",
+                            "icon": "fa-solid fa-layer-group",
+                            "redirect": "/waf/app/blackIP",
+                            "children": [
+                                {
+                                    "label": "黑名单IP管理",
+                                    "url": "/waf/app/blackIP",
+                                    "schemaApi": "/waf/pages/blackIPPage"
+                                },
+                                {
+                                    "label": "白名单IP管理",
+                                    "url": "/waf/app/whiteIP",
+                                    "schemaApi": "/waf/pages/whiteIPPage"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "审批中心",
+                            "url": "/app/menu/approvalCenter",
+                            "icon": "fa fa-cogs",
+                            "redirect": "/app/approvalCenter",
+                            "children": [
+                                {
+                                    "label": "审批中心",
+                                    "url": "/app/approvalCenter",
+                                    "schemaApi": "/pages/app-approvalCenter"
+                                },
+                                {
+                                    "label": "立项申请",
+                                    "url": "/app/approval/projectApplication",
+                                    "schemaApi": "/approval/1"
+                                },
+                                {
+                                    "label": "用章申请",
+                                    "url": "/app/approval/sealApply",
+                                    "schemaApi": "/approval/4"
+                                },
+                                {
+                                    "label": "报销",
+                                    "url": "/app/approval/expenseReimbursement",
+                                    "schemaApi": "/approval/5"
+                                },
+                                {
+                                    "label": "备用金申请",
+                                    "url": "/app/approval/financialRequest",
+                                    "schemaApi": "/approval/6"
+                                },
+                                {
+                                    "label": "付款",
+                                    "url": "/app/approval/pay",
+                                    "schemaApi": "/approval/7"
+                                },
+                                {
+                                    "label": "考勤补卡",
+                                    "url": "/app/approval/attendance/buka",
+                                    "schemaApi": "/approval/2"
+                                },
+                                {
+                                    "label": "请假",
+                                    "url": "/app/approval/leave",
+                                    "schemaApi": "/approval/3"
+                                },
+                                {
+                                    "label": "开票",
+                                    "url": "/app/approval/kaipiao",
+                                    "schemaApi": "/approval/8"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "流程记录",
+                            "url": "/app/menu/myProcess",
+                            "icon": "fa-solid fa-layer-group",
+                            "redirect": "/app/approval/myApplyLog",
+                            "children": [
+                                {
+                                    "label": "流程提交记录",
+                                    "url": "/app/approval/myApplyLog",
+                                    "schemaApi": "/pages/app-myApplyLog"
+                                },
+                                {
+                                    "label": "流程审批记录",
+                                    "url": "/app/approval/myApprovalLog",
+                                    "schemaApi": "/pages/app-myApprovalLog"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "我的项目",
+                            "url": "/app/menu/myProject",
+                            "schemaApi": "/pages/pc-project-my",
+                            "icon": "fa-solid fa-layer-group"
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "考勤",
+                            "url": "/app/menu/attendance/my",
+                            "schemaApi": "/pages/pc-attendance-my",
+                            "icon": "fa-solid fa-calendar-days"
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "流程\u0026审批",
+                            "url": "/app/menu/process",
+                            "icon": "fa fa-line-chart",
+                            "redirect": "/app/process",
+                            "children": [
+                                {
+                                    "label": "流程管理",
+                                    "url": "/app/process",
+                                    "schemaApi": "/pages/pc-process"
+                                },
+                                {
+                                    "label": "审批管理",
+                                    "url": "/app/approval/all",
+                                    "schemaApi": "/pages/app-approval"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "考勤管理",
+                            "url": "/app/menu/attendance",
+                            "schemaApi": "/pages/pc-attendance",
+                            "icon": "fa-solid fa-calendar-days"
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "客户\u0026项目",
+                            "url": "/app/menu/customer",
+                            "icon": "fa-solid fa-layer-group",
+                            "redirect": "/app/customer",
+                            "children": [
+                                {
+                                    "label": "客户管理",
+                                    "url": "/app/customer",
+                                    "schemaApi": "/pages/pc-customer"
+                                },
+                                {
+                                    "label": "项目管理",
+                                    "url": "/app/project",
+                                    "schemaApi": "/pages/pc-project"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "用户\u0026权限",
+                            "url": "/app/menu/user",
+                            "icon": "fa fa-users",
+                            "redirect": "/app/user",
+                            "children": [
+                                {
+                                    "label": "用户管理",
+                                    "url": "/app/user",
+                                    "schemaApi": "/pages/pc-user"
+                                },
+                                {
+                                    "label": "角色管理",
+                                    "url": "/app/role",
+                                    "schemaApi": "/pages/pc-role"
+                                },
+                                {
+                                    "label": "菜单管理",
+                                    "url": "/app/menu",
+                                    "schemaApi": "/pages/pc-menu"
+                                },
+                                {
+                                    "label": "权限管理",
+                                    "url": "/app/permission",
+                                    "schemaApi": "/pages/pc-permission"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+
+
+        amis.embed('#root', data, {});
+
+    })();
+</script>
+</body>
+</html>

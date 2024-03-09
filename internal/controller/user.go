@@ -35,11 +35,11 @@ func NewUserController(userService *service.UserService, conf *config.Config) *U
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param LoginRequest body LoginRequest true "request body"
+// @Param api_handler.LoginRequest body api_handler.LoginRequest true "请求体"
 // @Success 200 {object} api_handler.Response
 // @Router /waf/api/v1/auth/dologin [post]
 func (c *UserController) DoLogin(g *gin.Context) {
-	var req LoginRequest
+	var req api_handler.LoginRequest
 	if err := g.ShouldBindJSON(&req); err != nil {
 		api_handler.ClientErrorHandler(g, 40001)
 		return

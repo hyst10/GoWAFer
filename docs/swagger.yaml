@@ -1,4 +1,31 @@
 definitions:
+  api_handler.CreateIPRequest:
+    properties:
+      expirationAt:
+        type: string
+      ip-address:
+        type: string
+      type:
+        type: integer
+    required:
+    - ip-address
+    type: object
+  api_handler.LoginRequest:
+    properties:
+      captcha:
+        type: string
+      captchaId:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - captcha
+    - captchaId
+    - password
+    - username
+    type: object
   api_handler.Response:
     properties:
       data:
@@ -8,21 +35,14 @@ definitions:
       status:
         type: integer
     type: object
-  controller.LoginRequest:
+  api_handler.UpdateIPRequest:
     properties:
-      captcha:
+      expirationAt:
         type: string
-      captchaID:
-        type: string
-      password:
-        type: string
-      username:
+      ip-address:
         type: string
     required:
-    - captcha
-    - captchaID
-    - password
-    - username
+    - ip-address
     type: object
 info:
   contact: {}
@@ -37,12 +57,12 @@ paths:
       - application/json
       description: dologin
       parameters:
-      - description: request body
+      - description: 请求体
         in: body
-        name: LoginRequest
+        name: api_handler.LoginRequest
         required: true
         schema:
-          $ref: '#/definitions/controller.LoginRequest'
+          $ref: '#/definitions/api_handler.LoginRequest'
       produces:
       - application/json
       responses:
@@ -68,4 +88,97 @@ paths:
       summary: 获取图片验证码
       tags:
       - Auth
+  /waf/api/v1/ip:
+    get:
+      description: 分页查询IP
+      parameters:
+      - description: 查询IP
+        in: query
+        name: keywords
+        type: string
+      - description: IP类型
+        in: query
+        name: type
+        required: true
+        type: string
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 页面大小
+        in: query
+        name: perPage
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 分页查询IP
+      tags:
+      - IP
+    post:
+      consumes:
+      - application/json
+      description: 新增IP记录
+      parameters:
+      - description: 请求体
+        in: body
+        name: api_handler.CreateIPRequest
+        required: true
+        schema:
+          $ref: '#/definitions/api_handler.CreateIPRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 新增IP记录
+      tags:
+      - IP
+  /waf/api/v1/ip/{id}:
+    delete:
+      description: 删除IP
+      parameters:
+      - description: IP主键ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 删除IP
+      tags:
+      - IP
+    patch:
+      description: 编辑IP
+      parameters:
+      - description: IP主键ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 请求体
+        in: body
+        name: api_handler.UpdateIPRequest
+        required: true
+        schema:
+          $ref: '#/definitions/api_handler.UpdateIPRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 编辑IP
+      tags:
+      - IP
 swagger: "2.0"
