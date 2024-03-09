@@ -37,12 +37,12 @@ definitions:
     type: object
   api_handler.UpdateIPRequest:
     properties:
-      expirationAt:
+      expiration_at:
         type: string
-      ip-address:
+      ip_address:
         type: string
     required:
-    - ip-address
+    - ip_address
     type: object
 info:
   contact: {}
@@ -181,4 +181,22 @@ paths:
       summary: 编辑IP
       tags:
       - IP
+  /waf/api/v1/log:
+    get:
+      description: 查询指定天数和小时数的日志记录
+      parameters:
+      - description: 查询范围天数
+        in: query
+        name: days
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 查询指定天数和小时数的日志记录
+      tags:
+      - Log
 swagger: "2.0"

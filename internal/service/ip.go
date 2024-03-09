@@ -11,7 +11,6 @@ type IPService struct {
 }
 
 func NewIPListService(r *repository.IPRepository) *IPService {
-	r.Migrate()
 	return &IPService{ipRepository: r}
 }
 

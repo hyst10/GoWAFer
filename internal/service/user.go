@@ -10,8 +10,6 @@ type UserService struct {
 }
 
 func NewUserService(r *repository.UserRepository) *UserService {
-	r.Migrate()
-	r.InsertDefaultUser()
 	return &UserService{
 		userRepository: r,
 	}

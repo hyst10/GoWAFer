@@ -1,0 +1,156 @@
+{
+  "type": "page",
+  "body": [
+    {
+      "type": "form",
+      "title": "过滤条件",
+      "target": "chart1,chart2",
+      "mode": "inline",
+      "submitOnInit": true,
+      "submitOnChange": true,
+      "className": "m-b",
+      "body": [
+        {
+          "type": "select",
+          "label": "查询范围",
+          "name": "days",
+          "value": 0.5,
+          "options": [
+            {
+              "label": "近2小时",
+              "value": 0.5
+            },
+            {
+              "label": "近1日",
+              "value": 1
+            },
+            {
+              "label": "近7日",
+              "value": 7
+            },
+            {
+              "label": "近30日",
+              "value": 30
+            }
+          ]
+        }
+      ],
+      "actions": []
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "grid",
+      "className": "m-t-lg",
+      "columns": [
+        {
+          "type": "service",
+          "name": "chart1",
+          "api": "/waf/api/v1/log?days=$days",
+          "initFetch": false,
+          "interval": 3000,
+          "body": [
+            {
+              "type": "chart",
+              "trackExpression": "${timeSegments},${count200s},${count403s}",
+              "config": {
+                "title": {
+                  "text": "流量日志"
+                },
+                "tooltip": {
+                  "trigger": "axis"
+                },
+                "legend": {
+                  "data": [
+                    "请求成功",
+                    "已拦截请求"
+                  ]
+                },
+                "xAxis": {
+                  "type": "category",
+                  "data": "${timeSegments || []}",
+                  "boundaryGap": false
+                },
+                "yAxis": {
+                  "type": "value",
+                  "name": "请求数"
+                },
+                "series": [
+                  {
+                    "name": "请求成功",
+                    "type": "line",
+                    "data": "${count200s || []}"
+                  },
+                  {
+                    "name": "已拦截请求",
+                    "type": "line",
+                    "data": "${count403s || []}",
+                    "lineStyle": {
+                      "color": "red"
+                    },
+                    "itemStyle": {
+                      "color": "red"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "service",
+          "name": "chart2",
+          "api": "/waf/api/v1/log?days=$days",
+          "initFetch": false,
+          "interval": 3000,
+          "body": [
+            {
+              "type": "chart",
+              "trackExpression": "${timeSegments},${count200s},${count403s}",
+              "config": {
+                "title": {
+                  "text": "流量日志"
+                },
+                "tooltip": {
+                  "trigger": "axis"
+                },
+                "legend": {
+                  "data": [
+                    "请求成功",
+                    "已拦截请求"
+                  ]
+                },
+                "xAxis": {
+                  "type": "category",
+                  "data": "${timeSegments || []}",
+                  "boundaryGap": true
+                },
+                "yAxis": {
+                  "type": "value",
+                  "name": "请求数"
+                },
+                "series": [
+                  {
+                    "name": "请求成功",
+                    "type": "bar",
+                    "data": "${count200s || []}"
+                  },
+                  {
+                    "name": "已拦截请求",
+                    "type": "bar",
+                    "data": "${count403s || []}",
+                    "itemStyle": {
+                      "color": "red"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+

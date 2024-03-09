@@ -205,6 +205,34 @@
                     }
                 }
             }
+        },
+        "/waf/api/v1/log": {
+            "get": {
+                "description": "查询指定天数和小时数的日志记录",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log"
+                ],
+                "summary": "查询指定天数和小时数的日志记录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "查询范围天数",
+                        "name": "days",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -265,13 +293,13 @@
         "api_handler.UpdateIPRequest": {
             "type": "object",
             "required": [
-                "ip-address"
+                "ip_address"
             ],
             "properties": {
-                "expirationAt": {
+                "expiration_at": {
                     "type": "string"
                 },
-                "ip-address": {
+                "ip_address": {
                     "type": "string"
                 }
             }

@@ -14,14 +14,6 @@ func NewIPRepository(db *gorm.DB) *IPRepository {
 	return &IPRepository{db: db}
 }
 
-// Migrate 迁移IP管理表
-func (r *IPRepository) Migrate() {
-	err := r.db.AutoMigrate(&model.IP{})
-	if err != nil {
-		panic(fmt.Sprintf("IP管理表创建失败：%v", err))
-	}
-}
-
 // FindPaginated 分页查询IP
 func (r *IPRepository) FindPaginated(pageIndex, pageSize int, ipType, keyword string) ([]model.IP, int) {
 	var ips []model.IP
