@@ -53,3 +53,12 @@ func (r *IPRepository) Update(i *model.IP) error {
 func (r *IPRepository) Delete(i *model.IP) error {
 	return r.db.Delete(i).Error
 }
+
+// IsIPExist 查询IP是否存在
+func (r *IPRepository) IsIPExist(ip string) (*model.IP, error) {
+	var current model.IP
+	if err := r.db.Where("IPAddress = ?", ip).First(&current).Error; err != nil {
+		return nil, err
+	}
+	return &current, nil
+}

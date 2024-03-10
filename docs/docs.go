@@ -82,6 +82,55 @@ var doc = `{
                 }
             }
         },
+        "/waf/api/v1/config": {
+            "get": {
+                "description": "获取配置信息",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Config"
+                ],
+                "summary": "获取配置信息",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "修改配置文件并重启服务",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Config"
+                ],
+                "summary": "修改配置文件",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "config.Config",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/config.Config"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/waf/api/v1/ip": {
             "get": {
                 "description": "分页查询IP",
@@ -318,6 +367,33 @@ var doc = `{
                 },
                 "ip_address": {
                     "type": "string"
+                }
+            }
+        },
+        "config.Config": {
+            "type": "object",
+            "properties": {
+                "secret": {
+                    "type": "object",
+                    "properties": {
+                        "jwtSecretKey": {
+                            "type": "string"
+                        },
+                        "sessionSecretKey": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "server": {
+                    "type": "object",
+                    "properties": {
+                        "targetAddress": {
+                            "type": "string"
+                        },
+                        "wafPort": {
+                            "type": "integer"
+                        }
+                    }
                 }
             }
         }

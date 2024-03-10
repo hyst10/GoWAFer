@@ -8,17 +8,19 @@ import (
 // Config 配置文件结构
 type Config struct {
 	Server struct {
-		Port int `mapstructure:"port"`
-	} `mapstructure:"server"`
+		WafPort       int    `mapstructure:"wafPort" json:"wafPort"`
+		TargetAddress string `mapstructure:"targetAddress" json:"targetAddress"`
+	} `mapstructure:"server" json:"server"`
 
-	Jwt struct {
-		SecretKey string `mapstructure:"secretKey"`
-	} `mapstructure:"jwt"`
+	Secret struct {
+		JwtSecretKey     string `mapstructure:"jwtSecretKey" json:"jwtSecretKey"`
+		SessionSecretKey string `mapstructure:"sessionSecretKey" json:"sessionSecretKey"`
+	} `mapstructure:"secret" json:"secret"`
 }
 
 // ReadConfig 读取配置文件
 func ReadConfig() *Config {
-	viper.SetConfigName("config") // 配置文件名 (without extension)
+	viper.SetConfigName("config") // 配置文件名
 	viper.SetConfigType("yaml")   // 配置文件类型
 	viper.AddConfigPath(".")      // 搜索配置文件的路径
 	// 读取配置文件

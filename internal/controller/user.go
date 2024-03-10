@@ -73,10 +73,10 @@ func (c *UserController) DoLogin(g *gin.Context) {
 			"iss":      os.Getenv("ENV"),
 			"exp":      time.Now().Add(10 * time.Minute).Unix(),
 		})
-	token := jwt_handler.GenerateJwt(jwtClaims, c.conf.Jwt.SecretKey)
+	token := jwt_handler.GenerateJwt(jwtClaims, c.conf.Secret.JwtSecretKey)
 
 	// 检查用户的refreshToken是否过期，过期就重新生成
-	decodedRefreshToke := jwt_handler.VerifyUserRefreshToken(user.RefreshToken, c.conf.Jwt.SecretKey)
+	decodedRefreshToke := jwt_handler.VerifyUserRefreshToken(user.RefreshToken, c.conf.Secret.JwtSecretKey)
 	if decodedRefreshToke == nil {
 		// 重新生成refreshToken
 		jwtClaims = jwt.NewWithClaims(
@@ -86,7 +86,7 @@ func (c *UserController) DoLogin(g *gin.Context) {
 				"iss": os.Getenv("ENV"),
 				"exp": time.Now().Add(7200 * time.Hour).Unix(),
 			})
-		user.RefreshToken = jwt_handler.GenerateJwt(jwtClaims, c.conf.Jwt.SecretKey)
+		user.RefreshToken = jwt_handler.GenerateJwt(jwtClaims, c.conf.Secret.JwtSecretKey)
 	}
 
 	session := sessions.Default(g)

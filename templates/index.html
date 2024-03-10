@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
-    <link rel="shortcut icon" href="/static/img/favicon.ico"/>
+    <link rel="shortcut icon" href="/static/img/logo.png"/>
     <link rel="stylesheet" title="default" href="/static/sdk/sdk.css"/>
     <link rel="stylesheet" href="/static/sdk/helper.css"/>
     <link rel="stylesheet" href="/static/sdk/iconfont.css"/>
@@ -33,7 +33,7 @@
         var data = {
             "type": "app",
             "brandName": "GoWAFer",
-            "logo": "/static/img/favicon.ico",
+            "logo": "/static/img/logo.png",
             "asideBefore": "<div class=\"p-0.5 text-center\"></div>",
             "pages": [
                 {
@@ -65,6 +65,16 @@
                                     "schemaApi": "/waf/pages/whiteIPPage"
                                 }
                             ]
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "waf配置",
+                            "url": "/waf/app/menu/config",
+                            "icon": "fa-solid fa-layer-group",
+                            "schemaApi": "/waf/pages/configPage"
                         }
                     ]
                 }

@@ -1,5 +1,12 @@
 package api_handler
 
+// Response 通用响应结构
+type Response struct {
+	Status  int         `json:"status"`
+	Message string      `json:"msg"`
+	Data    interface{} `json:"data"`
+}
+
 // LogStats 用于表示图表数据的结构
 type LogStats struct {
 	Time     string `json:"time"`

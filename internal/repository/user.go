@@ -24,6 +24,14 @@ func (r *UserRepository) FindByUsername(username string) (*model.User, error) {
 	return &user, err
 }
 
+func (r *UserRepository) FindByID(id uint) (*model.User, error) {
+	var user model.User
+	if err := r.db.First(&user, id).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (r *UserRepository) Update(u *model.User) error {
 	return r.db.Save(u).Error
 }

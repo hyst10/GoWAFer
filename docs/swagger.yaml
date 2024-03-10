@@ -44,6 +44,23 @@ definitions:
     required:
     - ip_address
     type: object
+  config.Config:
+    properties:
+      secret:
+        properties:
+          jwtSecretKey:
+            type: string
+          sessionSecretKey:
+            type: string
+        type: object
+      server:
+        properties:
+          targetAddress:
+            type: string
+          wafPort:
+            type: integer
+        type: object
+    type: object
 info:
   contact: {}
   description: Golang编写的一款基于反向代理模式的web防火墙应用 By supercat0867
@@ -88,6 +105,38 @@ paths:
       summary: 获取图片验证码
       tags:
       - Auth
+  /waf/api/v1/config:
+    get:
+      description: 获取配置信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 获取配置信息
+      tags:
+      - Config
+    put:
+      description: 修改配置文件并重启服务
+      parameters:
+      - description: 请求体
+        in: body
+        name: config.Config
+        required: true
+        schema:
+          $ref: '#/definitions/config.Config'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 修改配置文件
+      tags:
+      - Config
   /waf/api/v1/ip:
     get:
       description: 分页查询IP

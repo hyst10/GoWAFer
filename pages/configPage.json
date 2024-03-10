@@ -1,0 +1,49 @@
+{
+  "type": "page",
+  "title": "waf配置",
+  "body": [
+    {
+      "type": "form",
+      "title": "",
+      "debug": false,
+      "initApi": "get:/waf/api/v1/config",
+      "api": "put:/waf/api/v1/config",
+      "body": [
+        {
+          "type": "combo",
+          "name": "server",
+          "label": "运行配置",
+          "items": [
+            {
+              "name": "wafPort",
+              "label": "运行端口",
+              "type": "input-number"
+            },
+            {
+              "name": "targetAddress",
+              "label": "真实服务地址",
+              "type": "input-text"
+            }
+          ]
+        },
+        {
+          "type": "combo",
+          "name": "secret",
+          "label": "密钥配置",
+          "items": [
+            {
+              "name": "jwtSecretKey",
+              "label": "jwt密钥",
+              "type": "input-text"
+            },
+            {
+              "name": "sessionSecretKey",
+              "label": "session密钥",
+              "type": "input-text"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

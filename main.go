@@ -5,6 +5,7 @@ import (
 	_ "GoWAFer/docs"
 	"GoWAFer/pkg/config"
 	"GoWAFer/pkg/database"
+	"GoWAFer/pkg/utils/graceful"
 	"GoWAFer/web"
 	"fmt"
 	"github.com/gin-contrib/sessions"
@@ -12,6 +13,9 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"log"
+	"net/http"
+	"time"
 )
 
 // @title GoWAFer
@@ -30,15 +34,15 @@ func main() {
 	r := gin.Default()
 
 	// 设置session
-	store := cookie.NewStore([]byte("sadsad"))
+	store := cookie.NewStore([]byte(conf.Secret.SessionSecretKey))
 	store.Options(sessions.Options{
-		MaxAge:   60 * 60 * 24 * 30, // 有效期一个月
-		Path:     "/",
+		MaxAge:   60 * 60 * 24 * 30,
+		Path:     "/waf",
 		HttpOnly: true,
 		Secure:   false,
 	})
 	// 设置cookie、session中间件
-	r.Use(sessions.Sessions("master-session", store))
+	r.Use(sessions.Sessions("this-is-not-a-cookie", store))
 
 	// 加载静态资源
 	r.Static("/static", "./static")
@@ -47,12 +51,22 @@ func main() {
 
 	// swagger 文档
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	// 注册API路由
-	api.RegisterAllHandlers(r, db, conf)
 	// 注册页面路由
-	web.RegisterWebHandler(r, conf)
+	web.RegisterWebHandler(r, db, conf)
+	// 注册API路由、注册反向代理路由
+	api.RegisterAllHandlers(r, db, conf)
 
 	// 启动waf服务
-	r.Run(fmt.Sprintf(":%d", conf.Server.Port))
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", conf.Server.WafPort),
+		Handler: r,
+	}
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Printf("服务异常：%s\n", err)
+		}
+	}()
 
+	graceful.Welcome()
+	graceful.ShutdownGin(srv, time.Second*3)
 }
