@@ -42,6 +42,132 @@
               "type": "input-text"
             }
           ]
+        },
+        {
+          "type": "combo",
+          "name": "rateLimiter",
+          "label": "限速器配置",
+          "multiLine": true,
+          "items": [
+            {
+              "name": "mode",
+              "label": "限速模式",
+              "type": "select",
+              "options": [
+                {
+                  "value": 1,
+                  "label": "令牌桶模式"
+                },
+                {
+                  "value": 2,
+                  "label": "漏桶模式"
+                },
+                {
+                  "value": 3,
+                  "label": "固定窗口模式"
+                },
+                {
+                  "value": 4,
+                  "label": "滑动窗口模式"
+                }
+              ]
+            },
+            {
+              "name": "maxCounter",
+              "label": "长期封禁阀值",
+              "remark": "单IP超过此封禁数后会被自动拉入长期IP黑名单",
+              "type": "input-number"
+            },
+            {
+              "name": "banCounter",
+              "label": "短期封禁阀值",
+              "remark": "单IP超过此封禁数后会被自动拉入短期IP黑名单",
+              "type": "input-number"
+            },
+            {
+              "name": "banDuration",
+              "suffix": "秒",
+              "label": "短期封禁时间",
+              "remark": "单IP触发短期封禁的封禁时长，单位为秒。",
+              "type": "input-number"
+            },
+            {
+              "type": "combo",
+              "name": "tokenBucket",
+              "label": "令牌桶配置",
+              "visibleOn": "this.mode === 1",
+              "items": [
+                {
+                  "name": "maxToken",
+                  "label": "最大令牌数",
+                  "type": "input-number"
+                },
+                {
+                  "name": "tokenPerSecond",
+                  "label": "令牌生成速率",
+                  "type": "input-number",
+                  "suffix": "个/秒"
+                }
+              ]
+            },
+            {
+              "type": "combo",
+              "name": "leakyBucket",
+              "label": "漏桶配置",
+              "visibleOn": "this.mode === 2",
+              "items": [
+                {
+                  "name": "capacity",
+                  "label": "桶容量",
+                  "type": "input-number"
+                },
+                {
+                  "name": "leakyPerSecond",
+                  "label": "漏水速率",
+                  "type": "input-number",
+                  "suffix": "滴/秒"
+                }
+              ]
+            },
+            {
+              "type": "combo",
+              "name": "fixedWindow",
+              "label": "固定窗口",
+              "visibleOn": "this.mode === 3",
+              "items": [
+                {
+                  "name": "windowSize",
+                  "label": "窗口期",
+                  "type": "input-number",
+                  "suffix": "秒"
+                },
+                {
+                  "name": "maxRequest",
+                  "label": "最大请求",
+                  "type": "input-number"
+                }
+              ]
+            },
+            {
+              "type": "combo",
+              "name": "slideWindow",
+              "label": "滑动窗口",
+              "visibleOn": "this.mode === 4",
+              "items": [
+                {
+                  "name": "windowSize",
+                  "label": "窗口期",
+                  "type": "input-number",
+                  "suffix": "秒"
+                },
+                {
+                  "name": "maxRequest",
+                  "label": "最大队列",
+                  "type": "input-number"
+                }
+              ]
+            }
+          ]
         }
       ]
     }

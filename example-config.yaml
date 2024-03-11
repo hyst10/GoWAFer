@@ -1,11 +1,25 @@
 # GoWAFer 配置文件
 
-# 运行配置
-server:
-  targetaddress: http://127.0.0.1 # 目标地址
-  wafport: 8080 # waf运行端口
-
-#  密钥配置
+ratelimiter:
+  bancounter: 2
+  banduration: 60
+  fixedwindow:
+    maxrequest: 3
+    windowsize: 3
+  leakybucket:
+    capacity: 3
+    leakypersecond: 1
+  maxcounter: 4
+  mode: 1
+  slidewindow:
+    maxrequest: 3
+    windowsize: 3
+  tokenbucket:
+    maxtoken: 30
+    tokenpersecond: 1
 secret:
-  jwtsecretkey: 123456adad # jwt密钥
-  sessionsecretkey: snadkadmsa # session密码
+  jwtsecretkey: 123456adad
+  sessionsecretkey: snadkadmsa
+server:
+  targetaddress: http://127.0.0.1
+  wafport: 8080

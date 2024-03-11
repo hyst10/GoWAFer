@@ -54,6 +54,28 @@ func (c *ConfigController) UpdateConfig(g *gin.Context) {
 			"jwtSecretKey":     req.Secret.JwtSecretKey,
 			"sessionSecretKey": req.Secret.SessionSecretKey,
 		},
+		"rateLimiter": map[string]interface{}{
+			"maxCounter":  req.RateLimiter.MaxCounter,
+			"banCounter":  req.RateLimiter.BanCounter,
+			"banDuration": req.RateLimiter.BanDuration,
+			"mode":        req.RateLimiter.Mode,
+			"tokenBucket": map[string]interface{}{
+				"maxToken":       req.RateLimiter.TokenBucket.MaxToken,
+				"tokenPerSecond": req.RateLimiter.TokenBucket.TokenPerSecond,
+			},
+			"leakyBucket": map[string]interface{}{
+				"capacity":       req.RateLimiter.LeakyBucket.Capacity,
+				"leakyPerSecond": req.RateLimiter.LeakyBucket.LeakyPerSecond,
+			},
+			"fixedWindow": map[string]interface{}{
+				"windowSize": req.RateLimiter.FixedWindow.WindowSize,
+				"maxRequest": req.RateLimiter.FixedWindow.MaxRequest,
+			},
+			"slideWindow": map[string]interface{}{
+				"windowSize": req.RateLimiter.SlideWindow.WindowSize,
+				"maxRequest": req.RateLimiter.SlideWindow.MaxRequest,
+			},
+		},
 	}
 
 	// 使用Viper进行全量更新

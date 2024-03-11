@@ -40,6 +40,8 @@ func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, conf *config.Config) {
 	r.Use(middleware.TrafficLogger(dbs.logRepository))
 	// 添加IP管理中间件
 	r.Use(middleware.IPManager(dbs.ipRepository))
+	// 添加限速器中间件
+	r.Use(middleware.RateLimitMiddleware(conf, dbs.ipRepository))
 
 	// 设置反向代理
 	target, _ := url.Parse(conf.Server.TargetAddress)
