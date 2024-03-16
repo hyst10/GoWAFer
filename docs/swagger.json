@@ -65,6 +65,46 @@
                 }
             }
         },
+        "/waf/api/v1/blockLog": {
+            "get": {
+                "description": "分页查询拦截日志",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BlockLog"
+                ],
+                "summary": "分页查询拦截日志",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "查询IP",
+                        "name": "keywords",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页面大小",
+                        "name": "perPage",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/waf/api/v1/config": {
             "get": {
                 "description": "获取配置信息",
@@ -282,6 +322,140 @@
                     }
                 }
             }
+        },
+        "/waf/api/v1/sqlInject": {
+            "get": {
+                "description": "分页查询SQL注入规则",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SQlInject"
+                ],
+                "summary": "分页查询SQL注入规则",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keywords",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页面大小",
+                        "name": "perPage",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "新增sql注入规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SQlInject"
+                ],
+                "summary": "新增sql注入规则",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "api_handler.CreateSqlInjectRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.CreateSqlInjectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/waf/api/v1/sqlInject/{id}": {
+            "delete": {
+                "description": "删除sql注入规则",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SQlInject"
+                ],
+                "summary": "删除sql注入规则",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "主键ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "编辑sql注入规则",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SQlInject"
+                ],
+                "summary": "编辑sql注入规则",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "主键ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "api_handler.CreateSqlInjectRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.CreateSqlInjectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -299,6 +473,17 @@
                 },
                 "type": {
                     "type": "integer"
+                }
+            }
+        },
+        "api_handler.CreateSqlInjectRequest": {
+            "type": "object",
+            "required": [
+                "rule"
+            ],
+            "properties": {
+                "rule": {
+                    "type": "string"
                 }
             }
         },
@@ -356,6 +541,84 @@
         "config.Config": {
             "type": "object",
             "properties": {
+                "rateLimiter": {
+                    "description": "限速器配置",
+                    "type": "object",
+                    "properties": {
+                        "banCounter": {
+                            "description": "计数器常规值，超过触发常规封禁时间",
+                            "type": "integer"
+                        },
+                        "banDuration": {
+                            "description": "常规封禁时间，单位秒",
+                            "type": "integer"
+                        },
+                        "fixedWindow": {
+                            "description": "固定窗口模式配置",
+                            "type": "object",
+                            "properties": {
+                                "maxRequest": {
+                                    "description": "窗口内最大请求数",
+                                    "type": "integer"
+                                },
+                                "windowSize": {
+                                    "description": "窗口大小,单位秒",
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "leakyBucket": {
+                            "description": "漏桶模式配置",
+                            "type": "object",
+                            "properties": {
+                                "capacity": {
+                                    "description": "桶容量",
+                                    "type": "integer"
+                                },
+                                "leakyPerSecond": {
+                                    "description": "漏水速度，单位秒",
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "maxCounter": {
+                            "description": "计数器最大值，超过该值拉入永久IP黑名单",
+                            "type": "integer"
+                        },
+                        "mode": {
+                            "description": "限速算法，1:令牌桶2:漏桶3:固定窗口4:滑动窗口",
+                            "type": "integer"
+                        },
+                        "slideWindow": {
+                            "description": "滑动窗口模式配置",
+                            "type": "object",
+                            "properties": {
+                                "maxRequest": {
+                                    "description": "窗口内最大队列数",
+                                    "type": "integer"
+                                },
+                                "windowSize": {
+                                    "description": "窗口大小，单位秒",
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "tokenBucket": {
+                            "description": "令牌桶模式配置",
+                            "type": "object",
+                            "properties": {
+                                "maxToken": {
+                                    "description": "最大令牌数",
+                                    "type": "integer"
+                                },
+                                "tokenPerSecond": {
+                                    "description": "令牌生成速度，单位秒",
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                },
                 "secret": {
                     "type": "object",
                     "properties": {

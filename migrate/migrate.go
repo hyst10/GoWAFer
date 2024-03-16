@@ -23,6 +23,16 @@ func migrate(db *gorm.DB) {
 	if err != nil {
 		panic(fmt.Sprintf("流量日志表创建失败：%v", err))
 	}
+
+	err = db.AutoMigrate(&model.BlockLog{})
+	if err != nil {
+		panic(fmt.Sprintf("拦截日志表创建失败：%v", err))
+	}
+
+	err = db.AutoMigrate(&model.SqlInjectionRules{})
+	if err != nil {
+		panic(fmt.Sprintf("sql注入规则表创建失败：%v", err))
+	}
 }
 
 func insert(db *gorm.DB) {
@@ -32,6 +42,22 @@ func insert(db *gorm.DB) {
 	err := db.FirstOrCreate(&defaultUser, model.User{Model: gorm.Model{ID: 1}}).Error
 	if err != nil {
 		panic(fmt.Sprintf("默认管理员创建失败：%v", err))
+	}
+
+	sqlDefault := []model.SqlInjectionRules{
+		{Rule: "(?i)(union)(.*)(select)"},
+		{Rule: "(?i)select(.*)from"},
+		{Rule: "(?i)insert into"},
+		{Rule: "(?i)delete from"},
+		{Rule: "(?i)drop table"},
+		{Rule: "(?i)update(.*)set"},
+		{Rule: "--"},
+		{Rule: "(\\b|\\')(OR|or|oR|Or)('|\\b)\\s*('\\d+'|'\\d+'--\\s*|'\\d+'(\\s+)(--)?|\\d+)(\\s+)(=|like)(\\s+)(\\b|\\')\\d+('|\\b)"},
+		{Rule: "/\\*.*\\*/"},
+		{Rule: ";"},
+	}
+	for _, sql := range sqlDefault {
+		db.FirstOrCreate(&sql, model.SqlInjectionRules{Rule: sql.Rule})
 	}
 }
 

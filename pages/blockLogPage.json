@@ -1,0 +1,178 @@
+{
+  "type": "page",
+  "title": "拦截日志",
+  "body": [
+    {
+      "type": "crud",
+      "api": "/waf/api/v1/blockLog?page=${page}&perPage=${perPage}&keywords=${keywords}",
+      "interval": 3000,
+      "defaultParams": {
+        "perPage": 10
+      },
+      "headerToolbar": [
+        "statistics",
+        "switch-per-page",
+        "export-excel",
+        {
+          "type": "pagination",
+          "align": "right"
+        }
+      ],
+      "footerToolbar": [
+        "statistics",
+        "switch-per-page",
+        "pagination"
+      ],
+      "syncLocation": false,
+      "filter": {
+        "title": "条件搜索",
+        "body": [
+          {
+            "type": "group",
+            "body": [
+              {
+                "type": "input-text",
+                "name": "keywords",
+                "label": "IP",
+                "clearable": true,
+                "placeholder": "通过IP搜索",
+                "size": "sm"
+              }
+            ]
+          }
+        ],
+        "actions": [
+          {
+            "type": "reset",
+            "label": "重置"
+          },
+          {
+            "type": "submit",
+            "level": "primary",
+            "label": "查询"
+          }
+        ]
+      },
+      "tableLayout": "fixed",
+      "columns": [
+        {
+          "label": "发生时间",
+          "name": "createdAt",
+          "type": "date",
+          "format": "YYYY年MM月DD日 HH时mm分ss秒",
+          "width": 100
+        },
+        {
+          "label": "客户端IP",
+          "name": "clientIP",
+          "type": "tpl",
+          "tpl": "<div style='background-color: #f2f4f8; padding: 5px; border-radius: 4px; text-align: center;'>${clientIP}</div>",
+          "width": 50
+        },
+        {
+          "label": "Url",
+          "name": "url",
+          "width": 50
+        },
+        {
+          "name": "method",
+          "label": "Method",
+          "type": "mapping",
+          "map": {
+            "GET": "<span class='label label-info'>GET</span>",
+            "POST": "<span class='label label-success'>POST</span>",
+            "PUT": "<span class='label label-warning'>PUT</span>",
+            "DELETE": "<span class='label label-danger'>DELETE</span>"
+          },
+          "width": 50
+        },
+        {
+          "label": "拦截中间件",
+          "name": "blockBy",
+          "width": 50
+        },
+        {
+          "label": "拦截原因",
+          "name": "blockReason",
+          "width": 50
+        },
+        {
+          "type": "operation",
+          "label": "操作",
+          "fixed": "right",
+          "width": 100,
+          "buttons": [
+            {
+              "type": "button",
+              "icon": "fa fa-eye",
+              "actionType": "dialog",
+              "tooltip": "查看",
+              "dialog": {
+                "title": "查看",
+                "body": {
+                  "type": "form",
+                  "body": [
+                    {
+                      "type": "static-date",
+                      "name": "createdAt",
+                      "format": "YYYY年MM月DD日 HH时mm分ss秒",
+                      "label": "发生时间"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "clientIP",
+                      "label": "IP"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "url",
+                      "label": "Url"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "method",
+                      "label": "Method"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "userAgent",
+                      "label": "User-Agent"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "referer",
+                      "label": "Referer"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "contentType",
+                      "label": "ContentType"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

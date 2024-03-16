@@ -35,3 +35,24 @@ type Log struct {
 	Latency   time.Duration
 	CreatedAt time.Time
 }
+
+// BlockLog 拦截记录模型
+type BlockLog struct {
+	ID          uint          `gorm:"primarykey" json:"id"`
+	CreatedAt   time.Time     `json:"createdAt"` // 发生时间
+	ClientIP    string        `json:"clientIP"`  // 客户端IP
+	Method      string        `json:"method"`    // http方法
+	Url         string        `json:"url"`       // 完整的请求url
+	UserAgent   string        `json:"userAgent"` // ua头
+	Referer     string        `json:"referer"`   // 来源页面
+	ContentType string        `json:"contentType"`
+	BlockBy     string        `json:"blockBy"`
+	BlockReason string        `json:"blockReason"`
+	Latency     time.Duration `json:"latency"`
+}
+
+// SqlInjectionRules sql注入规则模型
+type SqlInjectionRules struct {
+	ID   uint   `gorm:"primarykey" json:"id"`
+	Rule string `json:"rule"`
+}

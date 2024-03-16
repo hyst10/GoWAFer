@@ -20,3 +20,8 @@ type UpdateIPRequest struct {
 	IPAddress    string `json:"ip_address" binding:"required"`
 	ExpirationAt string `json:"expiration_at"`
 }
+
+// CreateSqlInjectRequest 新增sql注入规则请求
+type CreateSqlInjectRequest struct {
+	Rule string `json:"rule" binding:"required"`
+}
