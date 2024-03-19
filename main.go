@@ -3,6 +3,7 @@ package main
 import (
 	"GoWAFer/api"
 	_ "GoWAFer/docs"
+	"GoWAFer/migrate"
 	"GoWAFer/pkg/config"
 	"GoWAFer/pkg/database"
 	"GoWAFer/pkg/utils/graceful"
@@ -31,6 +32,9 @@ func main() {
 		panic(fmt.Sprintf("数据库连接失败：%v", err))
 	}
 
+	// 迁移数据
+	migrate.AutoMigrateAndInsertData(db)
+
 	r := gin.Default()
 
 	// 设置session
@@ -39,7 +43,7 @@ func main() {
 		MaxAge:   60 * 60 * 24 * 30,
 		Path:     "/waf",
 		HttpOnly: true,
-		Secure:   false,
+		//Secure:   true,
 	})
 	// 设置cookie、session中间件
 	r.Use(sessions.Sessions("this-is-not-a-cookie", store))

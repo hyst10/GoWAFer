@@ -15,6 +15,12 @@ func XSSDetectMiddleware(rules []*regexp.Regexp) gin.HandlerFunc {
 			return
 		}
 
+		// 检查是否为白名单路由
+		if skip, _ := c.Get("isWhiteRoute"); skip == true {
+			c.Next()
+			return
+		}
+
 		// 检查URL查询参数
 		query := c.Request.URL.Query()
 		for _, values := range query {

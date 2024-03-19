@@ -82,46 +82,6 @@ var doc = `{
                 }
             }
         },
-        "/waf/api/v1/blockLog": {
-            "get": {
-                "description": "分页查询拦截日志",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "BlockLog"
-                ],
-                "summary": "分页查询拦截日志",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "查询IP",
-                        "name": "keywords",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "页码",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "页面大小",
-                        "name": "perPage",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/waf/api/v1/config": {
             "get": {
                 "description": "获取配置信息",
@@ -184,7 +144,7 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "查询IP",
+                        "description": "关键词",
                         "name": "keywords",
                         "in": "query"
                     },
@@ -319,7 +279,7 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Log"
+                    "Log（日志模块）"
                 ],
                 "summary": "查询指定天数和小时数的日志记录",
                 "parameters": [
@@ -328,6 +288,190 @@ var doc = `{
                         "description": "查询范围天数",
                         "name": "days",
                         "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/waf/api/v1/log/getBlockLog": {
+            "get": {
+                "description": "分页查询被拦截的流量日志",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Log（日志模块）"
+                ],
+                "summary": "分页查询被拦截的流量日志",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "查询IP",
+                        "name": "keywords",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页面大小",
+                        "name": "perPage",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/waf/api/v1/routing": {
+            "get": {
+                "description": "分页查询路由",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Routing"
+                ],
+                "summary": "分页查询路由",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keywords",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "路由类型",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页面大小",
+                        "name": "perPage",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "新增路由",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Routing"
+                ],
+                "summary": "新增路由",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "api_handler.CreateRoutingRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.CreateRoutingRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/waf/api/v1/routing/{id}": {
+            "delete": {
+                "description": "删除路由",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Routing"
+                ],
+                "summary": "删除路由",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "主键ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "编辑路由",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Routing"
+                ],
+                "summary": "编辑路由",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "主键ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "api_handler.UpdateRoutingRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.UpdateRoutingRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -473,6 +617,140 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/waf/api/v1/xssDetect": {
+            "get": {
+                "description": "分页查询xss攻击匹配规则",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "XssDetect"
+                ],
+                "summary": "分页查询xss攻击匹配规则",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keywords",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页面大小",
+                        "name": "perPage",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "新增xss攻击匹配规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "XssDetect"
+                ],
+                "summary": "新增xss攻击匹配规则",
+                "parameters": [
+                    {
+                        "description": "请求体",
+                        "name": "api_handler.CreateXssDetectRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.CreateXssDetectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/waf/api/v1/xssDetect/{id}": {
+            "delete": {
+                "description": "删除sql注入规则",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "XssDetect"
+                ],
+                "summary": "删除sql注入规则",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "主键ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "编辑xss攻击匹配规则",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "XssDetect"
+                ],
+                "summary": "编辑xss攻击匹配规则",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "主键ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "请求体",
+                        "name": "api_handler.CreateXssDetectRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.CreateXssDetectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api_handler.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -493,7 +771,35 @@ var doc = `{
                 }
             }
         },
+        "api_handler.CreateRoutingRequest": {
+            "type": "object",
+            "required": [
+                "route"
+            ],
+            "properties": {
+                "method": {
+                    "type": "string"
+                },
+                "route": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
         "api_handler.CreateSqlInjectRequest": {
+            "type": "object",
+            "required": [
+                "rule"
+            ],
+            "properties": {
+                "rule": {
+                    "type": "string"
+                }
+            }
+        },
+        "api_handler.CreateXssDetectRequest": {
             "type": "object",
             "required": [
                 "rule"
@@ -551,6 +857,20 @@ var doc = `{
                     "type": "string"
                 },
                 "ip_address": {
+                    "type": "string"
+                }
+            }
+        },
+        "api_handler.UpdateRoutingRequest": {
+            "type": "object",
+            "required": [
+                "route"
+            ],
+            "properties": {
+                "method": {
+                    "type": "string"
+                },
+                "route": {
                     "type": "string"
                 }
             }

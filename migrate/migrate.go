@@ -1,8 +1,7 @@
-package main
+package migrate
 
 import (
 	"GoWAFer/internal/model"
-	"GoWAFer/pkg/database"
 	"GoWAFer/pkg/hash_handler"
 	"fmt"
 	"gorm.io/gorm"
@@ -17,6 +16,11 @@ func migrate(db *gorm.DB) {
 	err = db.AutoMigrate(&model.IP{})
 	if err != nil {
 		panic(fmt.Sprintf("IP管理表创建失败：%v", err))
+	}
+
+	err = db.AutoMigrate(&model.Routing{})
+	if err != nil {
+		panic(fmt.Sprintf("路由管理表创建失败：%v", err))
 	}
 
 	err = db.AutoMigrate(&model.Log{})
@@ -76,13 +80,7 @@ func insert(db *gorm.DB) {
 	}
 }
 
-func main() {
-	// 创建数据库连接
-	db, err := database.InitDB()
-	if err != nil {
-		panic(fmt.Sprintf("数据库连接失败：%v", err))
-	}
-
+func AutoMigrateAndInsertData(db *gorm.DB) {
 	migrate(db)
 	insert(db)
 }

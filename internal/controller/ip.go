@@ -6,6 +6,7 @@ import (
 	"GoWAFer/pkg/pagination"
 	"GoWAFer/pkg/utils/api_handler"
 	"github.com/gin-gonic/gin"
+	"net"
 	"net/http"
 	"strconv"
 	"time"
@@ -35,6 +36,12 @@ func (c *IPController) CreateIP(g *gin.Context) {
 		return
 	}
 
+	// 检查IP格式是否正确
+	if net.ParseIP(req.IPAddress) == nil {
+		api_handler.ClientErrorHandler(g, 40007)
+		return
+	}
+
 	expirationInt, err := strconv.Atoi(req.ExpirationAt)
 	if err != nil {
 		api_handler.ClientErrorHandler(g, 40001)
@@ -58,7 +65,7 @@ func (c *IPController) CreateIP(g *gin.Context) {
 // @Description 分页查询IP
 // @Tags IP
 // @Produce json
-// @Param keywords query string false "查询IP"
+// @Param keywords query string false "关键词"
 // @Param type query string true "IP类型"
 // @Param page query int false "页码"
 // @Param perPage query int false "页面大小"
@@ -86,6 +93,12 @@ func (c *IPController) UpdateIP(g *gin.Context) {
 	var req api_handler.UpdateIPRequest
 	if err := g.ShouldBindJSON(&req); err != nil {
 		api_handler.ClientErrorHandler(g, 40001)
+		return
+	}
+
+	// 检查IP格式是否正确
+	if net.ParseIP(req.IPAddress) == nil {
+		api_handler.ClientErrorHandler(g, 40007)
 		return
 	}
 

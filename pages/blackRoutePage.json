@@ -1,0 +1,208 @@
+{
+  "type": "page",
+  "title": "黑名单路由管理",
+  "remark": "路由为黑名单路由时禁止访问",
+  "toolbar": [
+    {
+      "type": "button",
+      "actionType": "dialog",
+      "label": "新增",
+      "icon": "fa fa-plus pull-left",
+      "primary": true,
+      "dialog": {
+        "title": "新增黑名单路由",
+        "body": {
+          "type": "form",
+          "api": "post:/waf/api/v1/routing",
+          "body": [
+            {
+              "type": "input-text",
+              "name": "route",
+              "label": "路由",
+              "required": true
+            },
+            {
+              "type": "select",
+              "name": "method",
+              "label": "Method",
+              "required": true,
+              "options": [
+                {
+                  "label": "GET",
+                  "value": "GET"
+                },
+                {
+                  "label": "POST",
+                  "value": "POST"
+                },
+                {
+                  "label": "PUT",
+                  "value": "PUT"
+                },
+                {
+                  "label": "DELETE",
+                  "value": "DELETE"
+                },
+                {
+                  "label": "PATCH",
+                  "value": "PATCH"
+                }
+              ]
+            },
+            {
+              "type": "hidden",
+              "name": "type",
+              "value": 2,
+              "required": true
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "body": [
+    {
+      "type": "crud",
+      "api": "/waf/api/v1/routing?page=${page}&perPage=${perPage}&keywords=${keywords}&type=2",
+      "defaultParams": {
+        "perPage": 10
+      },
+      "headerToolbar": [
+        "statistics",
+        "switch-per-page",
+        "export-excel",
+        {
+          "type": "pagination",
+          "align": "right"
+        }
+      ],
+      "footerToolbar": [
+        "statistics",
+        "switch-per-page",
+        "pagination"
+      ],
+      "syncLocation": false,
+      "filter": {
+        "title": "条件搜索",
+        "body": [
+          {
+            "type": "group",
+            "body": [
+              {
+                "type": "input-text",
+                "name": "keywords",
+                "label": "路由",
+                "clearable": true,
+                "placeholder": "通过路由搜索",
+                "size": "sm"
+              }
+            ]
+          }
+        ],
+        "actions": [
+          {
+            "type": "reset",
+            "label": "重置"
+          },
+          {
+            "type": "submit",
+            "level": "primary",
+            "label": "查询"
+          }
+        ]
+      },
+      "tableLayout": "fixed",
+      "columns": [
+        {
+          "label": "ID",
+          "name": "id",
+          "width": 70
+        },
+        {
+          "label": "路由",
+          "name": "route",
+          "width": 80,
+          "type": "tpl",
+          "tpl": "<div style='background-color: #f2f4f8; padding: 5px; border-radius: 4px; text-align: center;'>${route}</div>"
+        },
+        {
+          "name": "method",
+          "label": "Method",
+          "type": "mapping",
+          "map": {
+            "GET": "<span class='label label-info'>GET</span>",
+            "POST": "<span class='label label-success'>POST</span>",
+            "PUT": "<span class='label label-warning'>PUT</span>",
+            "DELETE": "<span class='label label-danger'>DELETE</span>"
+          },
+          "width": 50
+        },
+        {
+          "type": "operation",
+          "label": "操作",
+          "fixed": "right",
+          "width": 100,
+          "buttons": [
+            {
+              "type": "button",
+              "icon": "fa fa-pencil",
+              "tooltip": "编辑",
+              "actionType": "dialog",
+              "dialog": {
+                "title": "编辑",
+                "body": {
+                  "type": "form",
+                  "api": "patch:/waf/api/v1/routing/$id",
+                  "body": [
+                    {
+                      "type": "input-text",
+                      "name": "route",
+                      "label": "路由",
+                      "required": true
+                    },
+                    {
+                      "type": "select",
+                      "name": "method",
+                      "label": "Method",
+                      "required": true,
+                      "options": [
+                        {
+                          "label": "GET",
+                          "value": "GET"
+                        },
+                        {
+                          "label": "POST",
+                          "value": "POST"
+                        },
+                        {
+                          "label": "PUT",
+                          "value": "PUT"
+                        },
+                        {
+                          "label": "DELETE",
+                          "value": "DELETE"
+                        },
+                        {
+                          "label": "PATCH",
+                          "value": "PATCH"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "button",
+              "icon": "fa fa-times text-danger",
+              "actionType": "ajax",
+              "tooltip": "删除",
+              "confirmText": "确认要删除?",
+              "api": "delete:/waf/api/v1/routing/$id"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -10,7 +10,25 @@ definitions:
     required:
     - ip-address
     type: object
+  api_handler.CreateRoutingRequest:
+    properties:
+      method:
+        type: string
+      route:
+        type: string
+      type:
+        type: integer
+    required:
+    - route
+    type: object
   api_handler.CreateSqlInjectRequest:
+    properties:
+      rule:
+        type: string
+    required:
+    - rule
+    type: object
+  api_handler.CreateXssDetectRequest:
     properties:
       rule:
         type: string
@@ -50,6 +68,15 @@ definitions:
         type: string
     required:
     - ip_address
+    type: object
+  api_handler.UpdateRoutingRequest:
+    properties:
+      method:
+        type: string
+      route:
+        type: string
+    required:
+    - route
     type: object
   config.Config:
     properties:
@@ -168,32 +195,6 @@ paths:
       summary: 获取图片验证码
       tags:
       - Auth
-  /waf/api/v1/blockLog:
-    get:
-      description: 分页查询拦截日志
-      parameters:
-      - description: 查询IP
-        in: query
-        name: keywords
-        type: string
-      - description: 页码
-        in: query
-        name: page
-        type: integer
-      - description: 页面大小
-        in: query
-        name: perPage
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api_handler.Response'
-      summary: 分页查询拦截日志
-      tags:
-      - BlockLog
   /waf/api/v1/config:
     get:
       description: 获取配置信息
@@ -230,7 +231,7 @@ paths:
     get:
       description: 分页查询IP
       parameters:
-      - description: 查询IP
+      - description: 关键词
         in: query
         name: keywords
         type: string
@@ -336,7 +337,128 @@ paths:
             $ref: '#/definitions/api_handler.Response'
       summary: 查询指定天数和小时数的日志记录
       tags:
-      - Log
+      - Log（日志模块）
+  /waf/api/v1/log/getBlockLog:
+    get:
+      description: 分页查询被拦截的流量日志
+      parameters:
+      - description: 查询IP
+        in: query
+        name: keywords
+        type: string
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 页面大小
+        in: query
+        name: perPage
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 分页查询被拦截的流量日志
+      tags:
+      - Log（日志模块）
+  /waf/api/v1/routing:
+    get:
+      description: 分页查询路由
+      parameters:
+      - description: 关键词
+        in: query
+        name: keywords
+        type: string
+      - description: 路由类型
+        in: query
+        name: type
+        required: true
+        type: string
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 页面大小
+        in: query
+        name: perPage
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 分页查询路由
+      tags:
+      - Routing
+    post:
+      consumes:
+      - application/json
+      description: 新增路由
+      parameters:
+      - description: 请求体
+        in: body
+        name: api_handler.CreateRoutingRequest
+        required: true
+        schema:
+          $ref: '#/definitions/api_handler.CreateRoutingRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 新增路由
+      tags:
+      - Routing
+  /waf/api/v1/routing/{id}:
+    delete:
+      description: 删除路由
+      parameters:
+      - description: 主键ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 删除路由
+      tags:
+      - Routing
+    patch:
+      consumes:
+      - application/json
+      description: 编辑路由
+      parameters:
+      - description: 主键ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 请求体
+        in: body
+        name: api_handler.UpdateRoutingRequest
+        required: true
+        schema:
+          $ref: '#/definitions/api_handler.UpdateRoutingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 编辑路由
+      tags:
+      - Routing
   /waf/api/v1/sqlInject:
     get:
       description: 分页查询SQL注入规则
@@ -425,4 +547,92 @@ paths:
       summary: 编辑sql注入规则
       tags:
       - SQlInject
+  /waf/api/v1/xssDetect:
+    get:
+      description: 分页查询xss攻击匹配规则
+      parameters:
+      - description: 关键词
+        in: query
+        name: keywords
+        type: string
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 页面大小
+        in: query
+        name: perPage
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 分页查询xss攻击匹配规则
+      tags:
+      - XssDetect
+    post:
+      consumes:
+      - application/json
+      description: 新增xss攻击匹配规则
+      parameters:
+      - description: 请求体
+        in: body
+        name: api_handler.CreateXssDetectRequest
+        required: true
+        schema:
+          $ref: '#/definitions/api_handler.CreateXssDetectRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 新增xss攻击匹配规则
+      tags:
+      - XssDetect
+  /waf/api/v1/xssDetect/{id}:
+    delete:
+      description: 删除sql注入规则
+      parameters:
+      - description: 主键ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 删除sql注入规则
+      tags:
+      - XssDetect
+    patch:
+      description: 编辑xss攻击匹配规则
+      parameters:
+      - description: 主键ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 请求体
+        in: body
+        name: api_handler.CreateXssDetectRequest
+        required: true
+        schema:
+          $ref: '#/definitions/api_handler.CreateXssDetectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_handler.Response'
+      summary: 编辑xss攻击匹配规则
+      tags:
+      - XssDetect
 swagger: "2.0"

@@ -21,6 +21,19 @@ type UpdateIPRequest struct {
 	ExpirationAt string `json:"expiration_at"`
 }
 
+// CreateRoutingRequest 新增路由请求
+type CreateRoutingRequest struct {
+	Route  string `json:"route" binding:"required"`
+	Type   int    `json:"type"`
+	Method string `json:"method" binding:"required"`
+}
+
+// UpdateRoutingRequest 编辑路由请求
+type UpdateRoutingRequest struct {
+	Route  string `json:"route" binding:"required"`
+	Method string `json:"method"`
+}
+
 // CreateSqlInjectRequest 新增sql注入规则请求
 type CreateSqlInjectRequest struct {
 	Rule string `json:"rule" binding:"required"`

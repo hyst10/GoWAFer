@@ -20,9 +20,29 @@ type Admin struct {
 type IP struct {
 	ID           uint      `gorm:"primarykey" json:"id"` // 自增主键
 	IPAddress    string    `json:"ip_address"`           // IP地址
-	Type         int       `json:"type"`                 // 类型 1:黑名单 2:白名单
+	Type         int       `json:"type"`                 // 类型 1:白名单 2:黑名单
 	CreatedAt    time.Time `json:"created_at"`           // 添加日期
 	ExpirationAt time.Time `json:"expiration_at"`        // 过期时间
+}
+
+// Routing 路由模型
+type Routing struct {
+	ID     uint   `gorm:"primarykey" json:"id"` // 自增主键
+	Route  string `json:"route"`                // 路由
+	Method string `json:"method"`               // HTTP方法
+	Type   int    `json:"type"`                 // 类型 1:白名单 2:黑名单
+}
+
+// SqlInjectionRules sql注入检测规则模型
+type SqlInjectionRules struct {
+	ID   uint   `gorm:"primarykey" json:"id"`
+	Rule string `json:"rule"`
+}
+
+// XssDetectRules xss攻击检测规则模型
+type XssDetectRules struct {
+	ID   uint   `gorm:"primarykey" json:"id"`
+	Rule string `json:"rule"`
 }
 
 // Log 日志模型
@@ -39,16 +59,4 @@ type Log struct {
 	Latency     time.Duration `json:"latency"`
 	Status      int           `json:"status"`
 	CreatedAt   time.Time     `json:"createdAt"`
-}
-
-// SqlInjectionRules sql注入检测规则模型
-type SqlInjectionRules struct {
-	ID   uint   `gorm:"primarykey" json:"id"`
-	Rule string `json:"rule"`
-}
-
-// XssDetectRules xss攻击检测规则模型
-type XssDetectRules struct {
-	ID   uint   `gorm:"primarykey" json:"id"`
-	Rule string `json:"rule"`
 }

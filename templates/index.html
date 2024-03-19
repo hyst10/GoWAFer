@@ -50,21 +50,44 @@
                 {
                     "children": [
                         {
-                            "label": "IP黑白名单",
+                            "label": "IP管理",
                             "url": "/waf/app/menu/ip",
                             "icon": "fa-regular fa-rectangle-list",
                             "vendor": "",
                             "redirect": "/waf/app/blackIP",
                             "children": [
                                 {
-                                    "label": "黑名单IP管理",
+                                    "label": "IP黑名单",
                                     "url": "/waf/app/blackIP",
                                     "schemaApi": "/waf/pages/blackIPPage"
                                 },
                                 {
-                                    "label": "白名单IP管理",
+                                    "label": "IP白名单",
                                     "url": "/waf/app/whiteIP",
                                     "schemaApi": "/waf/pages/whiteIPPage"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "路由守卫",
+                            "url": "/waf/app/menu/routing",
+                            "icon": "fa-solid fa-road",
+                            "vendor": "",
+                            "redirect": "/waf/app/blackIP",
+                            "children": [
+                                {
+                                    "label": "路由黑名单",
+                                    "url": "/waf/app/blackRoute",
+                                    "schemaApi": "/waf/pages/blackRoutePage"
+                                },
+                                {
+                                    "label": "路由白名单",
+                                    "url": "/waf/app/whiteRoute",
+                                    "schemaApi": "/waf/pages/whiteRoutePage"
                                 }
                             ]
                         }

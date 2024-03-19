@@ -17,6 +17,7 @@ type Databases struct {
 	adminRepository     *repository.AdminRepository
 	logRepository       *repository.LogRepository
 	ipRepository        *repository.IPRepository
+	routingRepository   *repository.RoutingRepository
 	sqlInjectRepository *repository.SqlInjectRepository
 	xssDetectRepository *repository.XssDetectRepository
 }
@@ -26,6 +27,7 @@ func NewDatabases(db *gorm.DB) *Databases {
 		adminRepository:     repository.NewAdminRepository(db),
 		logRepository:       repository.NewLogRepository(db),
 		ipRepository:        repository.NewIPRepository(db),
+		routingRepository:   repository.NewRoutingRepository(db),
 		sqlInjectRepository: repository.NewSqlInjectRepository(db),
 		xssDetectRepository: repository.NewXssDetectRepository(db),
 	}
@@ -38,6 +40,7 @@ func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, conf *config.Config) {
 
 	RegisterUserHandler(apiGroup, dbs, conf)
 	RegisterIPHandler(apiGroup, dbs, conf)
+	RegisterRoutingHandler(apiGroup, dbs, conf)
 	RegisterLogHandler(apiGroup, dbs, conf)
 	RegisterConfigHandler(apiGroup, dbs, conf)
 	RegisterSqlInjectHandler(apiGroup, dbs, conf)
@@ -47,6 +50,8 @@ func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, conf *config.Config) {
 	r.Use(middleware.TrafficLogger(dbs.logRepository))
 	// 添加IP管理中间件
 	r.Use(middleware.IPManager(dbs.ipRepository))
+	// 添加路由守卫中间件
+	r.Use(middleware.RouteGuardMiddleware(dbs.routingRepository))
 	// 添加限速器中间件
 	r.Use(middleware.RateLimitMiddleware(conf, dbs.ipRepository))
 	// 加载sql注入防护规则
@@ -94,6 +99,17 @@ func RegisterIPHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) 
 	ipGroup.GET("", ipController.FindPaginatedIP)
 	ipGroup.PATCH(":id", ipController.UpdateIP)
 	ipGroup.DELETE(":id", ipController.DeleteIP)
+}
+
+func RegisterRoutingHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
+	routingService := service.NewRoutingService(dbs.routingRepository)
+	routingController := controller.NewRoutingController(routingService)
+	routingGroup := r.Group("/routing")
+	routingGroup.Use(middleware.WafAPIAuthMiddleware(conf.Secret.JwtSecretKey, dbs.adminRepository))
+	routingGroup.POST("", routingController.CreateRouting)
+	routingGroup.GET("", routingController.FindPaginatedRouting)
+	routingGroup.PATCH(":id", routingController.UpdateRouting)
+	routingGroup.DELETE(":id", routingController.DeleteRouting)
 }
 
 func RegisterLogHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
