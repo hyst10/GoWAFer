@@ -32,7 +32,7 @@ func RateLimitMiddleware(conf *config.Config, repo *repository.IPRepository) gin
 		// 解锁
 		ipLimitersMutex.Unlock()
 		if !limiter.Allow(clientIP, conf, repo) {
-			c.Set("BlockedBy", "CC防护")
+			c.Set("BlockedBy", "CC攻击防护中间件")
 			c.Set("BlockReason", "客户端IP访问频率过高")
 			api_handler.ForbiddenHandler(c, "访问过于频繁，请稍后再试！")
 			c.Abort()

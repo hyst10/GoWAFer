@@ -9,7 +9,7 @@ import (
 )
 
 func migrate(db *gorm.DB) {
-	err := db.AutoMigrate(&model.User{})
+	err := db.AutoMigrate(&model.Admin{})
 	if err != nil {
 		panic(fmt.Sprintf("管理员表创建失败：%v", err))
 	}
@@ -24,22 +24,22 @@ func migrate(db *gorm.DB) {
 		panic(fmt.Sprintf("流量日志表创建失败：%v", err))
 	}
 
-	err = db.AutoMigrate(&model.BlockLog{})
-	if err != nil {
-		panic(fmt.Sprintf("拦截日志表创建失败：%v", err))
-	}
-
 	err = db.AutoMigrate(&model.SqlInjectionRules{})
 	if err != nil {
 		panic(fmt.Sprintf("sql注入规则表创建失败：%v", err))
+	}
+
+	err = db.AutoMigrate(&model.XssDetectRules{})
+	if err != nil {
+		panic(fmt.Sprintf("xss攻击规则表创建失败：%v", err))
 	}
 }
 
 func insert(db *gorm.DB) {
 	// 哈希加盐加密
 	defaultPassword, _ := hash_handler.EncryptPassword("123456")
-	defaultUser := model.User{Model: gorm.Model{ID: 1}, Username: "admin", Password: defaultPassword, Nickname: "admin"}
-	err := db.FirstOrCreate(&defaultUser, model.User{Model: gorm.Model{ID: 1}}).Error
+	defaultUser := model.Admin{Model: gorm.Model{ID: 1}, Username: "admin", Password: defaultPassword, Nickname: "admin"}
+	err := db.FirstOrCreate(&defaultUser, model.Admin{Model: gorm.Model{ID: 1}}).Error
 	if err != nil {
 		panic(fmt.Sprintf("默认管理员创建失败：%v", err))
 	}
@@ -58,6 +58,21 @@ func insert(db *gorm.DB) {
 	}
 	for _, sql := range sqlDefault {
 		db.FirstOrCreate(&sql, model.SqlInjectionRules{Rule: sql.Rule})
+	}
+
+	xssDefault := []model.XssDetectRules{
+		{Rule: "<script[^>]*>.*?</script>"},
+		{Rule: "on\\w+=\"[^\"]*\""},
+		{Rule: "on\\w+='[^']*'"},
+		{Rule: "javascript:[^\\s]*"},
+		{Rule: "<iframe[^>]*>.*?</iframe>"},
+		{Rule: "<embed[^>]*>.*?</embed>"},
+		{Rule: "<object[^>]*>.*?</object>"},
+		{Rule: "srcdoc=\"[^\"]*\""},
+		{Rule: "<img[^>]*src=\"[^\"]*javascript:[^\"]*\"[^>]*>"},
+	}
+	for _, xss := range xssDefault {
+		db.FirstOrCreate(&xss, model.XssDetectRules{Rule: xss.Rule})
 	}
 }
 

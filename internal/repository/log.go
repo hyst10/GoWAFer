@@ -2,6 +2,7 @@ package repository
 
 import (
 	"GoWAFer/internal/model"
+	"fmt"
 	"gorm.io/gorm"
 	"time"
 )
@@ -14,6 +15,7 @@ func NewLogRepository(db *gorm.DB) *LogRepository {
 	return &LogRepository{db: db}
 }
 
+// Create 新增日志记录
 func (r *LogRepository) Create(l *model.Log) error {
 	return r.db.Create(l).Error
 }
@@ -36,4 +38,16 @@ func (r *LogRepository) FindLog(days, hours int) []model.Log {
 	r.db.Where(" CreatedAt >= ?", startTime).Find(&logs)
 
 	return logs
+}
+
+// FindPaginated 分页查询被拦截的流量日志
+func (r *LogRepository) FindPaginated(pageIndex, pageSize int, keyword string) ([]model.Log, int) {
+	var logs []model.Log
+	var count int64
+	query := r.db.Model(&model.Log{}).Order("CreatedAt DESC").Where("Status = ?", 403)
+	if keyword != "" {
+		query = query.Where("ClientIP LIKE ?", fmt.Sprintf("%%%s%%", keyword))
+	}
+	query.Count(&count).Limit(pageSize).Offset((pageIndex - 1) * pageSize).Find(&logs)
+	return logs, int(count)
 }

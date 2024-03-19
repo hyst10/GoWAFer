@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func WafAPIAuthMiddleware(jwtSecretKey string, r *repository.UserRepository) gin.HandlerFunc {
+func WafAPIAuthMiddleware(jwtSecretKey string, r *repository.AdminRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		token := session.Get("token")
@@ -57,7 +57,7 @@ func WafAPIAuthMiddleware(jwtSecretKey string, r *repository.UserRepository) gin
 	}
 }
 
-func WafWebAuthMiddleware(jwtSecretKey string, r *repository.UserRepository) gin.HandlerFunc {
+func WafWebAuthMiddleware(jwtSecretKey string, r *repository.AdminRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		token := session.Get("token")

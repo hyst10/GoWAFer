@@ -17,15 +17,17 @@ import (
 	"time"
 )
 
-type UserController struct {
-	userService *service.UserService
-	conf        *config.Config
+// AdminController 管理员Controller层接口
+type AdminController struct {
+	adminService *service.AdminService
+	conf         *config.Config
 }
 
-func NewUserController(userService *service.UserService, conf *config.Config) *UserController {
-	return &UserController{
-		userService: userService,
-		conf:        conf,
+// NewAdminController 实例化管理员Controller层接口
+func NewAdminController(adminService *service.AdminService, conf *config.Config) *AdminController {
+	return &AdminController{
+		adminService: adminService,
+		conf:         conf,
 	}
 }
 
@@ -38,7 +40,7 @@ func NewUserController(userService *service.UserService, conf *config.Config) *U
 // @Param api_handler.LoginRequest body api_handler.LoginRequest true "请求体"
 // @Success 200 {object} api_handler.Response
 // @Router /waf/api/v1/auth/dologin [post]
-func (c *UserController) DoLogin(g *gin.Context) {
+func (c *AdminController) DoLogin(g *gin.Context) {
 	var req api_handler.LoginRequest
 	if err := g.ShouldBindJSON(&req); err != nil {
 		api_handler.ClientErrorHandler(g, 40001)
@@ -50,7 +52,7 @@ func (c *UserController) DoLogin(g *gin.Context) {
 		return
 	}
 	// 检查是否存在此用户
-	user, err := c.userService.FindUserByUsername(req.Username)
+	user, err := c.adminService.FindAdminByUsername(req.Username)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			api_handler.ClientErrorHandler(g, 40003)
@@ -101,7 +103,7 @@ func (c *UserController) DoLogin(g *gin.Context) {
 	// 验证成功，记录登录日期、登录IP、refreshToken
 	user.LastLoginDate = time.Now()
 	user.LastLoginIP = g.ClientIP()
-	if err := c.userService.UpdateUserInfo(user); err != nil {
+	if err = c.adminService.UpdateAdminInfo(user); err != nil {
 		api_handler.InternalErrorHandler(g, err)
 		return
 	}
@@ -118,7 +120,7 @@ func (c *UserController) DoLogin(g *gin.Context) {
 // @Produce json
 // @Success 200 {object} api_handler.Response
 // @Router /waf/api/v1/auth/getCaptcha [get]
-func (c *UserController) GetCaptcha(g *gin.Context) {
+func (c *AdminController) GetCaptcha(g *gin.Context) {
 	captchaID, captchaBs6, err := captcha_handler.GenerateCaptcha()
 	if err != nil {
 		api_handler.InternalErrorHandler(g, err)

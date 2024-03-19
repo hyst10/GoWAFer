@@ -2,6 +2,7 @@ package service
 
 import (
 	"GoWAFer/internal/repository"
+	"GoWAFer/pkg/pagination"
 	"GoWAFer/pkg/utils/api_handler"
 	"time"
 )
@@ -78,4 +79,11 @@ func (c *LogService) FindLogs(days, hours int) api_handler.LogStatsResponse {
 	}
 
 	return response
+}
+
+func (c *LogService) FindPaginatedLogs(page *pagination.Pages, keyword string) *pagination.Pages {
+	items, count := c.logRepository.FindPaginated(page.Page, page.PerPage, keyword)
+	page.Items = items
+	page.Total = count
+	return page
 }

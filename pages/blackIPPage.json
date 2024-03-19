@@ -98,9 +98,8 @@
         {
           "label": "IP",
           "name": "ip_address",
-          "type": "tpl",
-          "tpl": "<div style='background-color: #f2f4f8; padding: 5px; border-radius: 4px; text-align: center;'>${ip_address}</div>",
-          "width": 50
+          "width": 50,
+          "copyable": true
         },
         {
           "label": "添加时间",

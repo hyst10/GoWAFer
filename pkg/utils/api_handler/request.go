@@ -25,3 +25,8 @@ type UpdateIPRequest struct {
 type CreateSqlInjectRequest struct {
 	Rule string `json:"rule" binding:"required"`
 }
+
+// CreateXssDetectRequest 新增xss攻击防御规则请求
+type CreateXssDetectRequest struct {
+	Rule string `json:"rule" binding:"required"`
+}

@@ -26,7 +26,7 @@ func IPManager(r *repository.IPRepository) gin.HandlerFunc {
 			return
 		}
 		// 黑名单
-		c.Set("BlockedBy", "IP管理")
+		c.Set("BlockedBy", "IP管理中间件")
 		c.Set("BlockReason", "客户端IP为黑名单IP")
 		api_handler.ForbiddenHandler(c, "该IP已被添加至黑名单，禁止访问！")
 		c.Abort()

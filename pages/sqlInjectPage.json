@@ -1,6 +1,6 @@
 {
   "type": "page",
-  "title": "SQL注入规则",
+  "title": "SQL注入防护规则",
   "toolbar": [
     {
       "type": "button",
@@ -9,9 +9,10 @@
       "icon": "fa fa-plus pull-left",
       "primary": true,
       "dialog": {
-        "title": "新增SQL注入规则",
+        "title": "新增防护规则",
         "body": {
           "type": "form",
+          "mode": "horizontal",
           "api": "post:/waf/api/v1/sqlInject",
           "body": [
             {
@@ -76,16 +77,15 @@
           }
         ]
       },
-      "tableLayout": "fixed",
       "columns": [
         {
           "label": "ID",
-          "name": "id",
-          "width": 70
+          "name": "id"
         },
         {
-          "label": "规则",
+          "label": "匹配规则",
           "name": "rule",
+          "remark": "正则表达式",
           "type": "tpl",
           "tpl": "<div style='background-color: #f2f4f8; padding: 5px; border-radius: 4px; text-align: center;'>${rule}</div>"
         },
@@ -93,7 +93,6 @@
           "type": "operation",
           "label": "操作",
           "fixed": "right",
-          "width": 80,
           "buttons": [
             {
               "type": "button",
@@ -109,7 +108,7 @@
                     {
                       "type": "input-text",
                       "name": "rule",
-                      "label": "规则",
+                      "label": "匹配规则",
                       "required": true
                     }
                   ]

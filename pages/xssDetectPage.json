@@ -1,6 +1,6 @@
 {
   "type": "page",
-  "title": "IP白名单管理",
+  "title": "XSS攻击防护规则",
   "toolbar": [
     {
       "type": "button",
@@ -9,27 +9,16 @@
       "icon": "fa fa-plus pull-left",
       "primary": true,
       "dialog": {
-        "title": "新增白名单IP",
+        "title": "新增防护规则",
         "body": {
           "type": "form",
-          "api": "post:/waf/api/v1/ip",
+          "mode": "horizontal",
+          "api": "post:/waf/api/v1/xssDetect",
           "body": [
             {
               "type": "input-text",
-              "name": "ip-address",
-              "label": "IP",
-              "required": true
-            },
-            {
-              "type": "hidden",
-              "name": "type",
-              "value": 1,
-              "required": true
-            },
-            {
-              "type": "input-datetime",
-              "name": "expirationAt",
-              "label": "过期时间",
+              "name": "rule",
+              "label": "规则",
               "required": true
             }
           ]
@@ -40,7 +29,7 @@
   "body": [
     {
       "type": "crud",
-      "api": "/waf/api/v1/ip?page=${page}&perPage=${perPage}&keywords=${keywords}&type=1",
+      "api": "/waf/api/v1/xssDetect?page=${page}&perPage=${perPage}&keywords=${keywords}",
       "defaultParams": {
         "perPage": 10
       },
@@ -68,9 +57,9 @@
               {
                 "type": "input-text",
                 "name": "keywords",
-                "label": "IP",
+                "label": "关键词",
                 "clearable": true,
-                "placeholder": "通过IP搜索",
+                "placeholder": "通过关键词搜索",
                 "size": "sm"
               }
             ]
@@ -88,38 +77,22 @@
           }
         ]
       },
-      "tableLayout": "fixed",
       "columns": [
         {
           "label": "ID",
-          "name": "id",
-          "width": 70
+          "name": "id"
         },
         {
-          "label": "IP",
-          "name": "ip_address",
-          "width": 50,
-          "copyable": true
-        },
-        {
-          "label": "添加时间",
-          "name": "created_at",
-          "type": "date",
-          "format": "YYYY年MM月DD日 HH时mm分ss秒",
-          "width": 50
-        },
-        {
-          "label": "过期时间",
-          "name": "expiration_at",
-          "type": "date",
-          "format": "YYYY年MM月DD日 HH时mm分ss秒",
-          "width": 50
+          "label": "匹配规则",
+          "name": "rule",
+          "remark": "正则表达式",
+          "type": "tpl",
+          "tpl": "<div style='background-color: #f2f4f8; padding: 5px; border-radius: 4px; text-align: center;'>${rule}</div>"
         },
         {
           "type": "operation",
           "label": "操作",
           "fixed": "right",
-          "width": 100,
           "buttons": [
             {
               "type": "button",
@@ -130,18 +103,12 @@
                 "title": "编辑",
                 "body": {
                   "type": "form",
-                  "api": "patch:/waf/api/v1/ip/$id",
+                  "api": "patch:/waf/api/v1/xssDetect/$id",
                   "body": [
                     {
                       "type": "input-text",
-                      "name": "ip_address",
-                      "label": "IP",
-                      "required": true
-                    },
-                    {
-                      "type": "input-datetime",
-                      "name": "expiration_at",
-                      "label": "过期时间",
+                      "name": "rule",
+                      "label": "匹配规则",
                       "required": true
                     }
                   ]
@@ -154,7 +121,7 @@
               "actionType": "ajax",
               "tooltip": "删除",
               "confirmText": "确认要删除?",
-              "api": "delete:/waf/api/v1/ip/$id"
+              "api": "delete:/waf/api/v1/xssDetect/$id"
             }
           ]
         }

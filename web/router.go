@@ -19,7 +19,7 @@ func RegisterWebHandler(r *gin.Engine, db *gorm.DB, conf *config.Config) {
 	})
 
 	// 添加鉴权中间件
-	userRepository := repository.NewUserRepository(db)
+	userRepository := repository.NewAdminRepository(db)
 	wafGroup.Use(middleware.WafWebAuthMiddleware(conf.Secret.JwtSecretKey, userRepository))
 
 	// 首页
@@ -39,7 +39,7 @@ func RegisterWebHandler(r *gin.Engine, db *gorm.DB, conf *config.Config) {
 		c.File(jsonFilePath)
 	})
 
-	// APP多页应用
+	// 多页应用
 	wafGroup.GET("/app/*action", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "index.html", nil)
 	})

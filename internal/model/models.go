@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-// User 管理员模型
-type User struct {
+// Admin 管理员模型
+type Admin struct {
 	gorm.Model
 	Username      string    // 用户名
 	Password      string    // 密码
@@ -27,19 +27,7 @@ type IP struct {
 
 // Log 日志模型
 type Log struct {
-	ID        uint   `gorm:"primarykey" json:"id"`
-	IP        string // IP
-	Path      string // Path
-	Method    string // http方法
-	Status    int
-	Latency   time.Duration
-	CreatedAt time.Time
-}
-
-// BlockLog 拦截记录模型
-type BlockLog struct {
 	ID          uint          `gorm:"primarykey" json:"id"`
-	CreatedAt   time.Time     `json:"createdAt"` // 发生时间
 	ClientIP    string        `json:"clientIP"`  // 客户端IP
 	Method      string        `json:"method"`    // http方法
 	Url         string        `json:"url"`       // 完整的请求url
@@ -49,10 +37,18 @@ type BlockLog struct {
 	BlockBy     string        `json:"blockBy"`
 	BlockReason string        `json:"blockReason"`
 	Latency     time.Duration `json:"latency"`
+	Status      int           `json:"status"`
+	CreatedAt   time.Time     `json:"createdAt"`
 }
 
-// SqlInjectionRules sql注入规则模型
+// SqlInjectionRules sql注入检测规则模型
 type SqlInjectionRules struct {
+	ID   uint   `gorm:"primarykey" json:"id"`
+	Rule string `json:"rule"`
+}
+
+// XssDetectRules xss攻击检测规则模型
+type XssDetectRules struct {
 	ID   uint   `gorm:"primarykey" json:"id"`
 	Rule string `json:"rule"`
 }

@@ -5,11 +5,12 @@ import (
 	"GoWAFer/internal/repository"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"time"
 )
 
-// TrafficLogger 记录访问日志的中间件
-func TrafficLogger(r *repository.LogRepository, r2 *repository.BlockLogRepository) gin.HandlerFunc {
+// TrafficLogger 用于记录流量日志的中间件
+func TrafficLogger(r *repository.LogRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 请求处理前
 		startTime := time.Now()
@@ -29,31 +30,34 @@ func TrafficLogger(r *repository.LogRepository, r2 *repository.BlockLogRepositor
 		endTime := time.Now()
 		latency := endTime.Sub(startTime)
 
-		// 检查是否被WAF中间件拦截
+		// 记录请求日志
+		currentLog := model.Log{
+			ClientIP:    requestIP,
+			Method:      requestMethod,
+			Url:         requestPath,
+			UserAgent:   c.GetHeader("User-Agent"),
+			Referer:     c.GetHeader("Referer"),
+			ContentType: c.ContentType(),
+			Latency:     latency,
+			Status:      responseStatus,
+		}
+
+		// 检查是否被WAF中间件拦截,被拦截则保留更多请求细节。
 		blockedBy, exists := c.Get("BlockedBy")
 		if exists {
+			// 获取拦截原因
 			blockReason, _ := c.Get("BlockReason")
-			log := model.Log{
-				Path:    requestPath,
-				Method:  requestMethod,
-				IP:      requestIP,
-				Latency: latency,
-				Status:  responseStatus,
-			}
-			r.Create(&log)
 
-			blockLog := model.BlockLog{
-				ClientIP:    requestIP,
-				Method:      requestMethod,
-				Url:         requestPath,
-				UserAgent:   c.GetHeader("User-Agent"),
-				Referer:     c.GetHeader("Referer"),
-				ContentType: c.ContentType(),
-				Latency:     latency,
-				BlockBy:     blockedBy.(string),
-				BlockReason: blockReason.(string),
-			}
-			r2.Create(&blockLog)
+			currentLog.UserAgent = c.GetHeader("User-Agent")
+			currentLog.Referer = c.GetHeader("Referer")
+			currentLog.ContentType = c.ContentType()
+			currentLog.BlockBy = blockedBy.(string)
+			currentLog.BlockReason = blockReason.(string)
+		}
+		// 保存日志到数据库
+		err := r.Create(&currentLog)
+		if err != nil {
+			log.Printf("日志保存失败：%v", err)
 		}
 
 	}

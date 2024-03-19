@@ -42,7 +42,8 @@
                             "label": "Dashboard",
                             "url": "/waf",
                             "schemaApi": "/waf/pages/indexPage",
-                            "icon": "fa fa-address-book"
+                            "icon": "fa-solid fa-chart-line",
+                            "vendor": "",
                         }
                     ]
                 },
@@ -51,7 +52,8 @@
                         {
                             "label": "IP黑白名单",
                             "url": "/waf/app/menu/ip",
-                            "icon": "fa-solid fa-layer-group",
+                            "icon": "fa-regular fa-rectangle-list",
+                            "vendor": "",
                             "redirect": "/waf/app/blackIP",
                             "children": [
                                 {
@@ -73,8 +75,31 @@
                         {
                             "label": "cc防护",
                             "url": "/waf/app/menu/ccProtect",
-                            "icon": "fa-solid fa-layer-group",
+                            "icon": "fa-solid fa-shield-halved",
+                            "vendor": "",
                             "schemaApi": "/waf/pages/ccProtectPage"
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "SQL注入防御",
+                            "url": "/waf/app/menu/sqlInjection",
+                            "icon": "fa-solid fa-database",
+                            "vendor": "",
+                            "schemaApi": "/waf/pages/sqlInjectPage"
+                        }
+                    ]
+                },
+                {
+                    "children": [
+                        {
+                            "label": "XSS攻击防御",
+                            "url": "/waf/app/menu/xssDetect",
+                            "icon": "fa-solid fa-code",
+                            "vendor": "",
+                            "schemaApi": "/waf/pages/xssDetectPage"
                         }
                     ]
                 },
@@ -83,7 +108,8 @@
                         {
                             "label": "拦截日志",
                             "url": "/waf/app/menu/blockLog",
-                            "icon": "fa-solid fa-layer-group",
+                            "icon": "fa-solid fa-hippo",
+                            "vendor": "",
                             "schemaApi": "/waf/pages/blockLogPage"
                         }
                     ]
@@ -93,18 +119,9 @@
                         {
                             "label": "waf运行配置",
                             "url": "/waf/app/menu/config",
-                            "icon": "fa-solid fa-layer-group",
+                            "icon": "fa-solid fa-gears",
+                            "vendor": "",
                             "schemaApi": "/waf/pages/configPage"
-                        }
-                    ]
-                },
-                {
-                    "children": [
-                        {
-                            "label": "SQL注入防护",
-                            "url": "/waf/app/menu/sqlInjection",
-                            "icon": "fa-solid fa-layer-group",
-                            "schemaApi": "/waf/pages/sqlInjectPage"
                         }
                     ]
                 },
