@@ -52,6 +52,8 @@ func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, conf *config.Config) {
 	r.Use(middleware.IPManager(dbs.ipRepository))
 	// 添加路由守卫中间件
 	r.Use(middleware.RouteGuardMiddleware(dbs.routingRepository))
+	// 添加CSRFToken中间件
+	r.Use(middleware.CsrfTokenMiddleware())
 	// 添加限速器中间件
 	r.Use(middleware.RateLimitMiddleware(conf, dbs.ipRepository))
 	// 加载sql注入防护规则

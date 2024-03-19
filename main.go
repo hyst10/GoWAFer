@@ -37,16 +37,14 @@ func main() {
 
 	r := gin.Default()
 
-	// 设置session
 	store := cookie.NewStore([]byte(conf.Secret.SessionSecretKey))
 	store.Options(sessions.Options{
 		MaxAge:   60 * 60 * 24 * 30,
-		Path:     "/waf",
+		Path:     "/",
 		HttpOnly: true,
 		//Secure:   true,
 	})
-	// 设置cookie、session中间件
-	r.Use(sessions.Sessions("this-is-not-a-cookie", store))
+	r.Use(sessions.Sessions("waf-session", store))
 
 	// 加载静态资源
 	r.Static("/static", "./static")

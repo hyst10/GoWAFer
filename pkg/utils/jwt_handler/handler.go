@@ -1,6 +1,8 @@
 package jwt_handler
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"github.com/dgrijalva/jwt-go"
 	"log"
@@ -75,4 +77,14 @@ func VerifyUserRefreshToken(token, secret string) *DecodeUserRefreshToken {
 		log.Printf("用户refreshToken解析错误：%v", jsonErr)
 	}
 	return &decodedToken
+}
+
+// GenerateRandomKey 生成随机密钥
+func GenerateRandomKey(length int) (string, error) {
+	key := make([]byte, length)
+	_, err := rand.Read(key)
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(key), nil
 }
