@@ -14,9 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"log"
-	"net/http"
-	"time"
 )
 
 // @title GoWAFer
@@ -34,6 +31,8 @@ func main() {
 
 	// 迁移数据
 	migrate.AutoMigrateAndInsertData(db)
+
+	graceful.Welcome()
 
 	r := gin.Default()
 
@@ -59,16 +58,5 @@ func main() {
 	api.RegisterAllHandlers(r, db, conf)
 
 	// 启动waf服务
-	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", conf.Server.WafPort),
-		Handler: r,
-	}
-	go func() {
-		if err := srv.ListenAndServe(); err != nil {
-			log.Printf("服务异常：%s\n", err)
-		}
-	}()
-
-	graceful.Welcome()
-	graceful.ShutdownGin(srv, time.Second*3)
+	r.Run()
 }
