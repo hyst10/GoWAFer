@@ -56,12 +56,12 @@ func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, conf *config.Config) {
 	// 添加路由守卫中间件
 	r.Use(middleware.RouteGuardMiddleware(dbs.routingRepository))
 	log.Println("路由守卫中间件加载成功")
-	// 添加CSRFToken中间件
-	r.Use(middleware.CsrfTokenMiddleware())
-	log.Println("CSRFToken中间件加载成功")
 	// 添加限速器中间件
 	r.Use(middleware.RateLimitMiddleware(conf, dbs.ipRepository))
 	log.Println("CC攻击防护中间件加载成功")
+	// 添加CSRFToken中间件
+	r.Use(middleware.CsrfTokenMiddleware())
+	log.Println("CSRFToken中间件加载成功")
 	// 加载sql注入防护规则
 	sqlInjectRules := dbs.sqlInjectRepository.FindAll()
 	var sqlInject []*regexp.Regexp
