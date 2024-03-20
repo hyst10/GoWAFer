@@ -5,6 +5,7 @@ import (
 	"GoWAFer/pkg/hash_handler"
 	"fmt"
 	"gorm.io/gorm"
+	"log"
 )
 
 func migrate(db *gorm.DB) {
@@ -12,31 +13,37 @@ func migrate(db *gorm.DB) {
 	if err != nil {
 		panic(fmt.Sprintf("管理员表创建失败：%v", err))
 	}
+	log.Println("管理员表迁移成功")
 
 	err = db.AutoMigrate(&model.IP{})
 	if err != nil {
 		panic(fmt.Sprintf("IP管理表创建失败：%v", err))
 	}
+	log.Println("IP表迁移成功")
 
 	err = db.AutoMigrate(&model.Routing{})
 	if err != nil {
 		panic(fmt.Sprintf("路由管理表创建失败：%v", err))
 	}
+	log.Println("路由表迁移成功")
 
 	err = db.AutoMigrate(&model.Log{})
 	if err != nil {
 		panic(fmt.Sprintf("流量日志表创建失败：%v", err))
 	}
+	log.Println("流量日志表迁移成功")
 
 	err = db.AutoMigrate(&model.SqlInjectionRules{})
 	if err != nil {
 		panic(fmt.Sprintf("sql注入规则表创建失败：%v", err))
 	}
+	log.Println("sql注入规则表迁移成功")
 
 	err = db.AutoMigrate(&model.XssDetectRules{})
 	if err != nil {
 		panic(fmt.Sprintf("xss攻击规则表创建失败：%v", err))
 	}
+	log.Println("xss攻击规则表迁移成功")
 }
 
 func insert(db *gorm.DB) {

@@ -4,6 +4,7 @@ import (
 	"GoWAFer/internal/model"
 	"fmt"
 	"gorm.io/gorm"
+	"time"
 )
 
 type IPRepository struct {
@@ -61,4 +62,12 @@ func (r *IPRepository) IsIPExist(ip string) (*model.IP, error) {
 		return nil, err
 	}
 	return &current, nil
+}
+
+// DeleteExpired 删除过期的IP
+func (r *IPRepository) DeleteExpired() error {
+	// 获取当前时间
+	now := time.Now()
+
+	return r.db.Where("ExpirationAt < ?", now).Delete(&model.IP{}).Error
 }

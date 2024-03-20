@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"net/http"
+	"os"
+	"time"
 )
 
 type ConfigController struct {
@@ -47,7 +49,6 @@ func (c *ConfigController) UpdateConfig(g *gin.Context) {
 	// 构造全量更新的配置map
 	updateMap := map[string]interface{}{
 		"server": map[string]interface{}{
-			"wafPort":       req.Server.WafPort,
 			"targetAddress": req.Server.TargetAddress,
 		},
 		"secret": map[string]interface{}{
@@ -90,7 +91,13 @@ func (c *ConfigController) UpdateConfig(g *gin.Context) {
 		return
 	}
 
-	// TODO 重启，搭配外部服务
-
 	g.JSON(http.StatusOK, api_handler.Response{Status: 0, Message: "操作成功！"})
+
+	// 启动一个新的goroutine来处理延迟重启逻辑
+	go func() {
+		// 等待足够的时间以确保响应已发送
+		time.Sleep(3 * time.Second)
+		// 退出程序
+		os.Exit(1)
+	}()
 }

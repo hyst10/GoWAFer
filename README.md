@@ -20,6 +20,7 @@ XSS)、跨站请求伪造(CSRF)等。它通过一系列的安全规则和策略�
 
 - Go 1.20或更高版本
 - Gin Web框架
+- mariadb 10.3或更高版本（或mysql）
 - 其他依赖见`go.mod`文件
 
 ## waf后台预览
@@ -33,13 +34,17 @@ XSS)、跨站请求伪造(CSRF)等。它通过一系列的安全规则和策略�
 
 ## 快速部署
 
+前置条件：
+
+本地需要安装mariadb数据库（mysql也可以）或使用远程数据库连接，创建一个数据库，并根据数据库环境修改代码包中的.env环境变量
+
 ### 1. 克隆项目
 
 首先，克隆本项目到本地环境：
 
 ```bash
 git clone https://github.com/supercat0867/GoWAFer.git
-cd waf
+cd GoWAFer
 ```
 
 ### 2.构建Docker镜像
@@ -47,6 +52,44 @@ cd waf
 ```bash
 docker build -t gowafer .
 ```
+
+### 3.修改.env
+
+修改代码包.env文件中的环境变量为实际情况
+
+### 4.运行容器
+
+```bash
+docker run -d -p 80:8080 --env-file .env --restart=always gowafer
+```
+
+### 5.进入后台
+
+后台登录入口: http://127.0.0.1/waf/login
+
+初始用户名：admin
+
+初始密码：123456
+
+## 快速部署demo
+
+demo为一个模拟真实服务的服务端，路由为/，包含了基础的Method。
+
+### 1. 克隆项目
+
+首先，克隆本项目到本地环境：
+
+```bash
+git clone https://github.com/supercat0867/GoWAFer.git
+cd GoWAFer/demo
+```
+
+### 2.构建Docker镜像
+
+```bash
+docker build -t demo .
+```
+
 ### 3.修改.env
 
 修改.env中的环境变量为实际情况
@@ -54,14 +97,8 @@ docker build -t gowafer .
 ### 4.运行容器
 
 ```bash
-docker run -d -p 80:8080 --env-file .env gowafer
+docker run -d -p 5353:5353 demo
 ```
-### 5.进入后台
-后台登录入口: http://127.0.0.1/waf/login
-
-初始用户名：admin
-
-初始密码：123456
 
 ## 贡献
 

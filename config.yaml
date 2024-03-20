@@ -20,4 +20,3 @@ secret:
     sessionsecretkey: snadkadmsa
 server:
     targetaddress: http://127.0.0.1:5353
-    wafport: 80

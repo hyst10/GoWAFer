@@ -8,7 +8,6 @@ import (
 // Config 配置文件结构
 type Config struct {
 	Server struct {
-		WafPort       int    `mapstructure:"wafPort" json:"wafPort"`
 		TargetAddress string `mapstructure:"targetAddress" json:"targetAddress"`
 	} `mapstructure:"server" json:"server"`
 

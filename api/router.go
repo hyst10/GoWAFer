@@ -8,6 +8,7 @@ import (
 	"GoWAFer/pkg/config"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"log"
 	"net/http/httputil"
 	"net/url"
 	"regexp"
@@ -48,14 +49,19 @@ func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, conf *config.Config) {
 
 	// 添加日志中间件
 	r.Use(middleware.TrafficLogger(dbs.logRepository))
+	log.Println("日志中间件加载成功")
 	// 添加IP管理中间件
 	r.Use(middleware.IPManager(dbs.ipRepository))
+	log.Println("IP管理中间件加载成功")
 	// 添加路由守卫中间件
 	r.Use(middleware.RouteGuardMiddleware(dbs.routingRepository))
+	log.Println("路由守卫中间件加载成功")
 	// 添加CSRFToken中间件
 	r.Use(middleware.CsrfTokenMiddleware())
+	log.Println("CSRFToken中间件加载成功")
 	// 添加限速器中间件
 	r.Use(middleware.RateLimitMiddleware(conf, dbs.ipRepository))
+	log.Println("CC攻击防护中间件加载成功")
 	// 加载sql注入防护规则
 	sqlInjectRules := dbs.sqlInjectRepository.FindAll()
 	var sqlInject []*regexp.Regexp
@@ -63,8 +69,10 @@ func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, conf *config.Config) {
 		compile := regexp.MustCompile(rule.Rule)
 		sqlInject = append(sqlInject, compile)
 	}
+	log.Println("sql注入防护规则加载成功")
 	// 添加sql注入检测中间件
 	r.Use(middleware.SqlInjectMiddleware(sqlInject))
+	log.Println("sql注入防护中间件加载成功")
 	// 加载xss攻击防护规则
 	xssDetectRules := dbs.xssDetectRepository.FindAll()
 	var xssDetect []*regexp.Regexp
@@ -72,8 +80,10 @@ func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, conf *config.Config) {
 		compile := regexp.MustCompile(rule.Rule)
 		xssDetect = append(xssDetect, compile)
 	}
+	log.Println("xss攻击防护规则加载成功")
 	// 添加xss攻击检测中间件
 	r.Use(middleware.XSSDetectMiddleware(xssDetect))
+	log.Println("xss攻击防护中间件加载成功")
 
 	// 设置反向代理
 	target, _ := url.Parse(conf.Server.TargetAddress)
@@ -89,7 +99,6 @@ func RegisterUserHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config
 	authGroup := r.Group("/auth")
 	authGroup.POST("/dologin", userController.DoLogin)
 	authGroup.GET("/getCaptcha", userController.GetCaptcha)
-	// 中间件
 }
 
 func RegisterIPHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
