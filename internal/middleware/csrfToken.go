@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"GoWAFer/pkg/utils/api_handler"
+	"GoWAFer/pkg/utils/api_helper"
 	"GoWAFer/pkg/utils/jwt_handler"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -23,7 +23,7 @@ func CsrfTokenMiddleware() gin.HandlerFunc {
 				// CSRF令牌验证失败
 				c.Set("BlockedBy", "CSRF-Token中间件")
 				c.Set("BlockReason", "CSRFToken验证失败")
-				api_handler.ForbiddenHandler(c, "CSRFToken验证失败！")
+				api_helper.ForbiddenHandler(c, "CSRFToken验证失败！")
 				c.Abort()
 				return
 			}

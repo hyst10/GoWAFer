@@ -5,7 +5,7 @@ import (
 	"GoWAFer/pkg/captcha_handler"
 	"GoWAFer/pkg/config"
 	"GoWAFer/pkg/hash_handler"
-	"GoWAFer/pkg/utils/api_handler"
+	"GoWAFer/pkg/utils/api_helper"
 	"GoWAFer/pkg/utils/jwt_handler"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
@@ -37,33 +37,33 @@ func NewAdminController(adminService *service.AdminService, conf *config.Config)
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param api_handler.LoginRequest body api_handler.LoginRequest true "请求体"
-// @Success 200 {object} api_handler.Response
+// @Param api_helper.LoginRequest body api_helper.LoginRequest true "请求体"
+// @Success 200 {object} api_helper.Response
 // @Router /waf/api/v1/auth/dologin [post]
 func (c *AdminController) DoLogin(g *gin.Context) {
-	var req api_handler.LoginRequest
+	var req api_helper.LoginRequest
 	if err := g.ShouldBindJSON(&req); err != nil {
-		api_handler.ClientErrorHandler(g, 40001)
+		api_helper.ClientErrorHandler(g, 40001)
 		return
 	}
 	// 检查验证码是否匹配
 	if !captcha_handler.VerifyCaptcha(req.CaptchaID, req.Captcha) {
-		api_handler.ClientErrorHandler(g, 40002)
+		api_helper.ClientErrorHandler(g, 40002)
 		return
 	}
 	// 检查是否存在此用户
 	user, err := c.adminService.FindAdminByUsername(req.Username)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			api_handler.ClientErrorHandler(g, 40003)
+			api_helper.ClientErrorHandler(g, 40003)
 			return
 		}
-		api_handler.InternalErrorHandler(g, err)
+		api_helper.InternalErrorHandler(g, err)
 		return
 	}
 	// 检查密码是否匹配
 	if !hash_handler.ValidatePassword(user.Password, req.Password) {
-		api_handler.ClientErrorHandler(g, 40003)
+		api_helper.ClientErrorHandler(g, 40003)
 		return
 	}
 
@@ -96,7 +96,7 @@ func (c *AdminController) DoLogin(g *gin.Context) {
 	session.Set("refreshToken", user.RefreshToken)
 	err = session.Save()
 	if err != nil {
-		api_handler.InternalErrorHandler(g, err)
+		api_helper.InternalErrorHandler(g, err)
 		return
 	}
 
@@ -104,12 +104,12 @@ func (c *AdminController) DoLogin(g *gin.Context) {
 	user.LastLoginDate = time.Now()
 	user.LastLoginIP = g.ClientIP()
 	if err = c.adminService.UpdateAdminInfo(user); err != nil {
-		api_handler.InternalErrorHandler(g, err)
+		api_helper.InternalErrorHandler(g, err)
 		return
 	}
 
 	// 登录成功，成功响应
-	g.JSON(http.StatusOK, api_handler.Response{Status: 0, Message: "success"})
+	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "success"})
 }
 
 // GetCaptcha godoc
@@ -118,13 +118,13 @@ func (c *AdminController) DoLogin(g *gin.Context) {
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Success 200 {object} api_handler.Response
+// @Success 200 {object} api_helper.Response
 // @Router /waf/api/v1/auth/getCaptcha [get]
 func (c *AdminController) GetCaptcha(g *gin.Context) {
 	captchaID, captchaBs6, err := captcha_handler.GenerateCaptcha()
 	if err != nil {
-		api_handler.InternalErrorHandler(g, err)
+		api_helper.InternalErrorHandler(g, err)
 		return
 	}
-	g.JSON(http.StatusOK, api_handler.Response{Status: 0, Message: "success", Data: map[string]string{"id": captchaID, "bs6": captchaBs6}})
+	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "success", Data: map[string]string{"id": captchaID, "bs6": captchaBs6}})
 }

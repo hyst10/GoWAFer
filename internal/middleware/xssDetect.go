@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"GoWAFer/pkg/utils/api_handler"
+	"GoWAFer/pkg/utils/api_helper"
 	"github.com/gin-gonic/gin"
 	"regexp"
 )
@@ -29,7 +29,7 @@ func XSSDetectMiddleware(rules []*regexp.Regexp) gin.HandlerFunc {
 					if pattern.MatchString(value) {
 						c.Set("BlockedBy", "xss攻击防护中间件")
 						c.Set("BlockReason", "查询参数中检测到xss攻击")
-						api_handler.ForbiddenHandler(c, "检测到xss攻击，禁止访问！")
+						api_helper.ForbiddenHandler(c, "检测到xss攻击，禁止访问！")
 						c.Abort()
 						return
 					}
@@ -47,7 +47,7 @@ func XSSDetectMiddleware(rules []*regexp.Regexp) gin.HandlerFunc {
 							if pattern.MatchString(value) {
 								c.Set("BlockedBy", "xss攻击防护中间件")
 								c.Set("BlockReason", "表单数据中检测到xss攻击")
-								api_handler.ForbiddenHandler(c, "检测到xss攻击，禁止访问！")
+								api_helper.ForbiddenHandler(c, "检测到xss攻击，禁止访问！")
 								c.Abort()
 								return
 							}

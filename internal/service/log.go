@@ -3,7 +3,7 @@ package service
 import (
 	"GoWAFer/internal/repository"
 	"GoWAFer/pkg/pagination"
-	"GoWAFer/pkg/utils/api_handler"
+	"GoWAFer/pkg/utils/api_helper"
 	"time"
 )
 
@@ -15,11 +15,11 @@ func NewLogService(r *repository.LogRepository) *LogService {
 	return &LogService{logRepository: r}
 }
 
-func (c *LogService) FindLogs(days, hours int) api_handler.LogStatsResponse {
+func (c *LogService) FindLogs(days, hours int) api_helper.LogStatsResponse {
 	items := c.logRepository.FindLog(days, hours)
 
 	// 初始化返回的结构
-	response := api_handler.LogStatsResponse{}
+	response := api_helper.LogStatsResponse{}
 
 	// 初始化开始时间和结束时间、日期分钟格式、区间
 	endTime := time.Now()

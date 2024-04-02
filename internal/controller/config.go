@@ -2,7 +2,7 @@ package controller
 
 import (
 	"GoWAFer/pkg/config"
-	"GoWAFer/pkg/utils/api_handler"
+	"GoWAFer/pkg/utils/api_helper"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"net/http"
@@ -25,10 +25,10 @@ func NewConfigController(conf *config.Config) *ConfigController {
 // @Description 获取配置信息
 // @Tags Config
 // @Produce json
-// @Success 200 {object} api_handler.Response
+// @Success 200 {object} api_helper.Response
 // @Router /waf/api/v1/config [get]
 func (c *ConfigController) GetConfig(g *gin.Context) {
-	g.JSON(http.StatusOK, api_handler.Response{Status: 0, Message: "success", Data: c.conf})
+	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "success", Data: c.conf})
 }
 
 // UpdateConfig godoc
@@ -37,12 +37,12 @@ func (c *ConfigController) GetConfig(g *gin.Context) {
 // @Tags Config
 // @Produce json
 // @Param config.Config body config.Config true "请求体"
-// @Success 200 {object} api_handler.Response
+// @Success 200 {object} api_helper.Response
 // @Router /waf/api/v1/config [put]
 func (c *ConfigController) UpdateConfig(g *gin.Context) {
 	var req config.Config
 	if err := g.ShouldBindJSON(&req); err != nil {
-		api_handler.ClientErrorHandler(g, 40001)
+		api_helper.ClientErrorHandler(g, 40001)
 		return
 	}
 
@@ -81,17 +81,17 @@ func (c *ConfigController) UpdateConfig(g *gin.Context) {
 
 	// 使用Viper进行全量更新
 	if err := viper.MergeConfigMap(updateMap); err != nil {
-		api_handler.InternalErrorHandler(g, err)
+		api_helper.InternalErrorHandler(g, err)
 		return
 	}
 
 	// 将更新后的配置保存到文件
 	if err := viper.WriteConfig(); err != nil {
-		api_handler.InternalErrorHandler(g, err)
+		api_helper.InternalErrorHandler(g, err)
 		return
 	}
 
-	g.JSON(http.StatusOK, api_handler.Response{Status: 0, Message: "操作成功！"})
+	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "操作成功！"})
 
 	// 启动一个新的goroutine来处理延迟重启逻辑
 	go func() {

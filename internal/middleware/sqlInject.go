@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"GoWAFer/pkg/utils/api_handler"
+	"GoWAFer/pkg/utils/api_helper"
 	"bytes"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -31,7 +31,7 @@ func SqlInjectMiddleware(rules []*regexp.Regexp) gin.HandlerFunc {
 					if pattern.MatchString(value) {
 						c.Set("BlockedBy", "sql注入防护中间件")
 						c.Set("BlockReason", "查询参数中检测到sql注入")
-						api_handler.ForbiddenHandler(c, "检测到sql注入攻击，禁止访问！")
+						api_helper.ForbiddenHandler(c, "检测到sql注入攻击，禁止访问！")
 						c.Abort()
 						return
 					}
@@ -45,7 +45,7 @@ func SqlInjectMiddleware(rules []*regexp.Regexp) gin.HandlerFunc {
 			if pattern.MatchString(string(body)) {
 				c.Set("BlockedBy", "sql注入防护中间件")
 				c.Set("BlockReason", "请求体body中检测到sql注入")
-				api_handler.ForbiddenHandler(c, "检测到sql注入攻击，禁止访问！")
+				api_helper.ForbiddenHandler(c, "检测到sql注入攻击，禁止访问！")
 				c.Abort()
 				return
 			}

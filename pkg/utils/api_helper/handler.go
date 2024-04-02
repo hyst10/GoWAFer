@@ -1,4 +1,4 @@
-package api_handler
+package api_helper
 
 import (
 	"github.com/gin-gonic/gin"
@@ -9,7 +9,7 @@ import (
 
 // ClientErrorHandler 客户端错误处理
 func ClientErrorHandler(c *gin.Context, code int) {
-	c.JSON(http.StatusOK, Response{Status: code, Message: ErrorCodeToMessage[code].Error()})
+	c.JSON(http.StatusOK, Response{Status: code, Msg: ErrorCodeToMessage[code].Error()})
 	c.Abort()
 	return
 }
@@ -17,13 +17,13 @@ func ClientErrorHandler(c *gin.Context, code int) {
 // InternalErrorHandler 服务端错误处理
 func InternalErrorHandler(c *gin.Context, err error) {
 	log.Printf("服务器异常错误：%s", err)
-	c.JSON(http.StatusOK, Response{Status: 500, Message: "服务器异常，请稍后再试！"})
+	c.JSON(http.StatusOK, Response{Status: 500, Msg: "服务器异常，请稍后再试！"})
 	c.Abort()
 	return
 }
 
 func ForbiddenHandler(c *gin.Context, errMsg string) {
-	c.JSON(http.StatusForbidden, Response{Status: 403, Message: errMsg})
+	c.JSON(http.StatusForbidden, Response{Status: 403, Msg: errMsg})
 	c.Abort()
 	return
 }

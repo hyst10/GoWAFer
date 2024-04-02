@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"GoWAFer/internal/repository"
-	"GoWAFer/pkg/utils/api_handler"
+	"GoWAFer/pkg/utils/api_helper"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,7 +28,7 @@ func IPManager(r *repository.IPRepository) gin.HandlerFunc {
 		// 黑名单
 		c.Set("BlockedBy", "IP管理中间件")
 		c.Set("BlockReason", "客户端IP为黑名单IP")
-		api_handler.ForbiddenHandler(c, "该IP已被添加至黑名单，禁止访问！")
+		api_helper.ForbiddenHandler(c, "该IP已被添加至黑名单，禁止访问！")
 		c.Abort()
 		return
 	}

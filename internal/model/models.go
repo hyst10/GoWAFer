@@ -25,14 +25,6 @@ type IP struct {
 	ExpirationAt time.Time `json:"expiration_at"`        // 过期时间
 }
 
-// Routing 路由模型
-type Routing struct {
-	ID     uint   `gorm:"primarykey" json:"id"` // 自增主键
-	Route  string `json:"route"`                // 路由
-	Method string `json:"method"`               // HTTP方法
-	Type   int    `json:"type"`                 // 类型 1:白名单 2:黑名单
-}
-
 // SqlInjectionRules sql注入检测规则模型
 type SqlInjectionRules struct {
 	ID   uint   `gorm:"primarykey" json:"id"`

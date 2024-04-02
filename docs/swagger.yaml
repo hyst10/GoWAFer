@@ -1,5 +1,5 @@
 definitions:
-  api_handler.CreateIPRequest:
+  api_helper.CreateIPRequest:
     properties:
       expirationAt:
         type: string
@@ -10,32 +10,21 @@ definitions:
     required:
     - ip-address
     type: object
-  api_handler.CreateRoutingRequest:
-    properties:
-      method:
-        type: string
-      route:
-        type: string
-      type:
-        type: integer
-    required:
-    - route
-    type: object
-  api_handler.CreateSqlInjectRequest:
+  api_helper.CreateSqlInjectRequest:
     properties:
       rule:
         type: string
     required:
     - rule
     type: object
-  api_handler.CreateXssDetectRequest:
+  api_helper.CreateXssDetectRequest:
     properties:
       rule:
         type: string
     required:
     - rule
     type: object
-  api_handler.LoginRequest:
+  api_helper.LoginRequest:
     properties:
       captcha:
         type: string
@@ -51,7 +40,7 @@ definitions:
     - password
     - username
     type: object
-  api_handler.Response:
+  api_helper.Response:
     properties:
       data:
         type: object
@@ -60,7 +49,7 @@ definitions:
       status:
         type: integer
     type: object
-  api_handler.UpdateIPRequest:
+  api_helper.UpdateIPRequest:
     properties:
       expiration_at:
         type: string
@@ -68,15 +57,6 @@ definitions:
         type: string
     required:
     - ip_address
-    type: object
-  api_handler.UpdateRoutingRequest:
-    properties:
-      method:
-        type: string
-      route:
-        type: string
-    required:
-    - route
     type: object
   config.Config:
     properties:
@@ -147,9 +127,20 @@ definitions:
         properties:
           targetAddress:
             type: string
-          wafPort:
-            type: integer
         type: object
+    type: object
+  types.AddRoutingRequest:
+    properties:
+      method:
+        type: string
+      route:
+        type: string
+      type:
+        type: integer
+    required:
+    - method
+    - route
+    - type
     type: object
 info:
   contact: {}
@@ -166,17 +157,17 @@ paths:
       parameters:
       - description: 请求体
         in: body
-        name: api_handler.LoginRequest
+        name: api_helper.LoginRequest
         required: true
         schema:
-          $ref: '#/definitions/api_handler.LoginRequest'
+          $ref: '#/definitions/api_helper.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 处理登录
       tags:
       - Auth
@@ -191,7 +182,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 获取图片验证码
       tags:
       - Auth
@@ -204,7 +195,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 获取配置信息
       tags:
       - Config
@@ -223,7 +214,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 修改配置文件
       tags:
       - Config
@@ -254,7 +245,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 分页查询IP
       tags:
       - IP
@@ -265,15 +256,15 @@ paths:
       parameters:
       - description: 请求体
         in: body
-        name: api_handler.CreateIPRequest
+        name: api_helper.CreateIPRequest
         required: true
         schema:
-          $ref: '#/definitions/api_handler.CreateIPRequest'
+          $ref: '#/definitions/api_helper.CreateIPRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 新增IP记录
       tags:
       - IP
@@ -292,7 +283,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 删除IP
       tags:
       - IP
@@ -306,17 +297,17 @@ paths:
         type: integer
       - description: 请求体
         in: body
-        name: api_handler.UpdateIPRequest
+        name: api_helper.UpdateIPRequest
         required: true
         schema:
-          $ref: '#/definitions/api_handler.UpdateIPRequest'
+          $ref: '#/definitions/api_helper.UpdateIPRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 编辑IP
       tags:
       - IP
@@ -334,7 +325,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 查询指定天数和小时数的日志记录
       tags:
       - Log（日志模块）
@@ -360,13 +351,32 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 分页查询被拦截的流量日志
       tags:
       - Log（日志模块）
   /waf/api/v1/routing:
+    delete:
+      consumes:
+      - application/json
+      description: 删除路由管理记录
+      parameters:
+      - description: 请求体
+        in: body
+        name: types.AddRoutingRequest
+        required: true
+        schema:
+          $ref: '#/definitions/types.AddRoutingRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_helper.Response'
+      summary: 删除路由管理记录
+      tags:
+      - Routing
     get:
-      description: 分页查询路由
+      description: 分页查询路由管理记录
       parameters:
       - description: 关键词
         in: query
@@ -391,72 +401,27 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
-      summary: 分页查询路由
+            $ref: '#/definitions/api_helper.Response'
+      summary: 分页查询路由管理记录
       tags:
       - Routing
     post:
       consumes:
       - application/json
-      description: 新增路由
+      description: 新增路由管理记录
       parameters:
       - description: 请求体
         in: body
-        name: api_handler.CreateRoutingRequest
+        name: types.AddRoutingRequest
         required: true
         schema:
-          $ref: '#/definitions/api_handler.CreateRoutingRequest'
+          $ref: '#/definitions/types.AddRoutingRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
-      summary: 新增路由
-      tags:
-      - Routing
-  /waf/api/v1/routing/{id}:
-    delete:
-      description: 删除路由
-      parameters:
-      - description: 主键ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api_handler.Response'
-      summary: 删除路由
-      tags:
-      - Routing
-    patch:
-      consumes:
-      - application/json
-      description: 编辑路由
-      parameters:
-      - description: 主键ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: 请求体
-        in: body
-        name: api_handler.UpdateRoutingRequest
-        required: true
-        schema:
-          $ref: '#/definitions/api_handler.UpdateRoutingRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api_handler.Response'
-      summary: 编辑路由
+            $ref: '#/definitions/api_helper.Response'
+      summary: 新增路由管理记录
       tags:
       - Routing
   /waf/api/v1/sqlInject:
@@ -481,7 +446,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 分页查询SQL注入规则
       tags:
       - SQlInject
@@ -492,15 +457,15 @@ paths:
       parameters:
       - description: 请求体
         in: body
-        name: api_handler.CreateSqlInjectRequest
+        name: api_helper.CreateSqlInjectRequest
         required: true
         schema:
-          $ref: '#/definitions/api_handler.CreateSqlInjectRequest'
+          $ref: '#/definitions/api_helper.CreateSqlInjectRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 新增sql注入规则
       tags:
       - SQlInject
@@ -519,7 +484,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 删除sql注入规则
       tags:
       - SQlInject
@@ -533,17 +498,17 @@ paths:
         type: integer
       - description: 请求体
         in: body
-        name: api_handler.CreateSqlInjectRequest
+        name: api_helper.CreateSqlInjectRequest
         required: true
         schema:
-          $ref: '#/definitions/api_handler.CreateSqlInjectRequest'
+          $ref: '#/definitions/api_helper.CreateSqlInjectRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 编辑sql注入规则
       tags:
       - SQlInject
@@ -569,7 +534,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 分页查询xss攻击匹配规则
       tags:
       - XssDetect
@@ -580,15 +545,15 @@ paths:
       parameters:
       - description: 请求体
         in: body
-        name: api_handler.CreateXssDetectRequest
+        name: api_helper.CreateXssDetectRequest
         required: true
         schema:
-          $ref: '#/definitions/api_handler.CreateXssDetectRequest'
+          $ref: '#/definitions/api_helper.CreateXssDetectRequest'
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 新增xss攻击匹配规则
       tags:
       - XssDetect
@@ -607,7 +572,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 删除sql注入规则
       tags:
       - XssDetect
@@ -621,17 +586,17 @@ paths:
         type: integer
       - description: 请求体
         in: body
-        name: api_handler.CreateXssDetectRequest
+        name: api_helper.CreateXssDetectRequest
         required: true
         schema:
-          $ref: '#/definitions/api_handler.CreateXssDetectRequest'
+          $ref: '#/definitions/api_helper.CreateXssDetectRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api_handler.Response'
+            $ref: '#/definitions/api_helper.Response'
       summary: 编辑xss攻击匹配规则
       tags:
       - XssDetect

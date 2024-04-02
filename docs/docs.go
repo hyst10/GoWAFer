@@ -41,11 +41,11 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "请求体",
-                        "name": "api_handler.LoginRequest",
+                        "name": "api_helper.LoginRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_handler.LoginRequest"
+                            "$ref": "#/definitions/api_helper.LoginRequest"
                         }
                     }
                 ],
@@ -53,7 +53,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -76,7 +76,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -96,7 +96,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -125,7 +125,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -172,7 +172,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -189,11 +189,11 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "请求体",
-                        "name": "api_handler.CreateIPRequest",
+                        "name": "api_helper.CreateIPRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_handler.CreateIPRequest"
+                            "$ref": "#/definitions/api_helper.CreateIPRequest"
                         }
                     }
                 ],
@@ -201,7 +201,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -230,7 +230,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -254,11 +254,11 @@ var doc = `{
                     },
                     {
                         "description": "请求体",
-                        "name": "api_handler.UpdateIPRequest",
+                        "name": "api_helper.UpdateIPRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_handler.UpdateIPRequest"
+                            "$ref": "#/definitions/api_helper.UpdateIPRequest"
                         }
                     }
                 ],
@@ -266,7 +266,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -294,7 +294,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -334,7 +334,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -342,14 +342,14 @@ var doc = `{
         },
         "/waf/api/v1/routing": {
             "get": {
-                "description": "分页查询路由",
+                "description": "分页查询路由管理记录",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Routing"
                 ],
-                "summary": "分页查询路由",
+                "summary": "分页查询路由管理记录",
                 "parameters": [
                     {
                         "type": "string",
@@ -381,28 +381,28 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
             },
             "post": {
-                "description": "新增路由",
+                "description": "新增路由管理记录",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Routing"
                 ],
-                "summary": "新增路由",
+                "summary": "新增路由管理记录",
                 "parameters": [
                     {
                         "description": "请求体",
-                        "name": "api_handler.CreateRoutingRequest",
+                        "name": "types.AddRoutingRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_handler.CreateRoutingRequest"
+                            "$ref": "#/definitions/types.AddRoutingRequest"
                         }
                     }
                 ],
@@ -410,67 +410,28 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/waf/api/v1/routing/{id}": {
-            "delete": {
-                "description": "删除路由",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Routing"
-                ],
-                "summary": "删除路由",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "主键ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
             },
-            "patch": {
-                "description": "编辑路由",
+            "delete": {
+                "description": "删除路由管理记录",
                 "consumes": [
-                    "application/json"
-                ],
-                "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Routing"
                 ],
-                "summary": "编辑路由",
+                "summary": "删除路由管理记录",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "主键ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "请求体",
-                        "name": "api_handler.UpdateRoutingRequest",
+                        "name": "types.AddRoutingRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_handler.UpdateRoutingRequest"
+                            "$ref": "#/definitions/types.AddRoutingRequest"
                         }
                     }
                 ],
@@ -478,7 +439,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -518,7 +479,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -535,11 +496,11 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "请求体",
-                        "name": "api_handler.CreateSqlInjectRequest",
+                        "name": "api_helper.CreateSqlInjectRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_handler.CreateSqlInjectRequest"
+                            "$ref": "#/definitions/api_helper.CreateSqlInjectRequest"
                         }
                     }
                 ],
@@ -547,7 +508,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -576,7 +537,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -600,11 +561,11 @@ var doc = `{
                     },
                     {
                         "description": "请求体",
-                        "name": "api_handler.CreateSqlInjectRequest",
+                        "name": "api_helper.CreateSqlInjectRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_handler.CreateSqlInjectRequest"
+                            "$ref": "#/definitions/api_helper.CreateSqlInjectRequest"
                         }
                     }
                 ],
@@ -612,7 +573,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -652,7 +613,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -669,11 +630,11 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "请求体",
-                        "name": "api_handler.CreateXssDetectRequest",
+                        "name": "api_helper.CreateXssDetectRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_handler.CreateXssDetectRequest"
+                            "$ref": "#/definitions/api_helper.CreateXssDetectRequest"
                         }
                     }
                 ],
@@ -681,7 +642,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -710,7 +671,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -734,11 +695,11 @@ var doc = `{
                     },
                     {
                         "description": "请求体",
-                        "name": "api_handler.CreateXssDetectRequest",
+                        "name": "api_helper.CreateXssDetectRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_handler.CreateXssDetectRequest"
+                            "$ref": "#/definitions/api_helper.CreateXssDetectRequest"
                         }
                     }
                 ],
@@ -746,7 +707,7 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api_handler.Response"
+                            "$ref": "#/definitions/api_helper.Response"
                         }
                     }
                 }
@@ -754,7 +715,7 @@ var doc = `{
         }
     },
     "definitions": {
-        "api_handler.CreateIPRequest": {
+        "api_helper.CreateIPRequest": {
             "type": "object",
             "required": [
                 "ip-address"
@@ -771,24 +732,7 @@ var doc = `{
                 }
             }
         },
-        "api_handler.CreateRoutingRequest": {
-            "type": "object",
-            "required": [
-                "route"
-            ],
-            "properties": {
-                "method": {
-                    "type": "string"
-                },
-                "route": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "integer"
-                }
-            }
-        },
-        "api_handler.CreateSqlInjectRequest": {
+        "api_helper.CreateSqlInjectRequest": {
             "type": "object",
             "required": [
                 "rule"
@@ -799,7 +743,7 @@ var doc = `{
                 }
             }
         },
-        "api_handler.CreateXssDetectRequest": {
+        "api_helper.CreateXssDetectRequest": {
             "type": "object",
             "required": [
                 "rule"
@@ -810,7 +754,7 @@ var doc = `{
                 }
             }
         },
-        "api_handler.LoginRequest": {
+        "api_helper.LoginRequest": {
             "type": "object",
             "required": [
                 "captcha",
@@ -833,7 +777,7 @@ var doc = `{
                 }
             }
         },
-        "api_handler.Response": {
+        "api_helper.Response": {
             "type": "object",
             "properties": {
                 "data": {
@@ -847,7 +791,7 @@ var doc = `{
                 }
             }
         },
-        "api_handler.UpdateIPRequest": {
+        "api_helper.UpdateIPRequest": {
             "type": "object",
             "required": [
                 "ip_address"
@@ -857,20 +801,6 @@ var doc = `{
                     "type": "string"
                 },
                 "ip_address": {
-                    "type": "string"
-                }
-            }
-        },
-        "api_handler.UpdateRoutingRequest": {
-            "type": "object",
-            "required": [
-                "route"
-            ],
-            "properties": {
-                "method": {
-                    "type": "string"
-                },
-                "route": {
                     "type": "string"
                 }
             }
@@ -972,11 +902,27 @@ var doc = `{
                     "properties": {
                         "targetAddress": {
                             "type": "string"
-                        },
-                        "wafPort": {
-                            "type": "integer"
                         }
                     }
+                }
+            }
+        },
+        "types.AddRoutingRequest": {
+            "type": "object",
+            "required": [
+                "method",
+                "route",
+                "type"
+            ],
+            "properties": {
+                "method": {
+                    "type": "string"
+                },
+                "route": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
                 }
             }
         }

@@ -1,4 +1,4 @@
-package api_handler
+package api_helper
 
 // LoginRequest 登录请求体
 type LoginRequest struct {
@@ -19,19 +19,6 @@ type CreateIPRequest struct {
 type UpdateIPRequest struct {
 	IPAddress    string `json:"ip_address" binding:"required"`
 	ExpirationAt string `json:"expiration_at"`
-}
-
-// CreateRoutingRequest 新增路由请求
-type CreateRoutingRequest struct {
-	Route  string `json:"route" binding:"required"`
-	Type   int    `json:"type"`
-	Method string `json:"method" binding:"required"`
-}
-
-// UpdateRoutingRequest 编辑路由请求
-type UpdateRoutingRequest struct {
-	Route  string `json:"route" binding:"required"`
-	Method string `json:"method"`
 }
 
 // CreateSqlInjectRequest 新增sql注入规则请求

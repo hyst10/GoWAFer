@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"GoWAFer/internal/repository"
-	"GoWAFer/pkg/utils/api_handler"
+	"GoWAFer/pkg/utils/api_helper"
 	"GoWAFer/pkg/utils/jwt_handler"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-contrib/sessions"
@@ -28,7 +28,7 @@ func WafAPIAuthMiddleware(jwtSecretKey string, r *repository.AdminRepository) gi
 
 				if decodedRefreshToken == nil {
 					// refreshToken也失效了，返回重新授权信息
-					api_handler.ForbiddenHandler(c, "token已失效，请重新登录授权！")
+					api_helper.ForbiddenHandler(c, "token已失效，请重新登录授权！")
 					c.Abort()
 					return
 				}
@@ -51,7 +51,7 @@ func WafAPIAuthMiddleware(jwtSecretKey string, r *repository.AdminRepository) gi
 			c.Next()
 			return
 		}
-		api_handler.ForbiddenHandler(c, "您无权限！请先登录授权！")
+		api_helper.ForbiddenHandler(c, "您无权限！请先登录授权！")
 		c.Abort()
 		return
 	}

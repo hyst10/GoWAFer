@@ -17,16 +17,20 @@
           "body": [
             {
               "type": "input-text",
-              "name": "route",
+              "name": "routing",
               "label": "路由",
               "required": true
             },
             {
               "type": "select",
               "name": "method",
-              "label": "Method",
+              "label": "HTTP方法",
               "required": true,
               "options": [
+                {
+                  "label": "*",
+                  "value": "*"
+                },
                 {
                   "label": "GET",
                   "value": "GET"
@@ -44,15 +48,27 @@
                   "value": "DELETE"
                 },
                 {
+                  "label": "HEAD",
+                  "value": "HEAD"
+                },
+                {
+                  "label": "OPTIONS",
+                  "value": "OPTIONS"
+                },
+                {
                   "label": "PATCH",
                   "value": "PATCH"
+                },
+                {
+                  "label": "TRACE",
+                  "value": "TRACE"
                 }
               ]
             },
             {
               "type": "hidden",
               "name": "type",
-              "value": 2,
+              "value": 1,
               "required": true
             }
           ]
@@ -63,7 +79,7 @@
   "body": [
     {
       "type": "crud",
-      "api": "/waf/api/v1/routing?page=${page}&perPage=${perPage}&keywords=${keywords}&type=2",
+      "api": "/waf/api/v1/routing?page=${page}&perPage=${perPage}&keywords=${keywords}&type=1",
       "defaultParams": {
         "perPage": 10
       },
@@ -91,10 +107,10 @@
               {
                 "type": "input-text",
                 "name": "keywords",
-                "label": "路由",
+                "label": "关键词搜索",
                 "clearable": true,
-                "placeholder": "通过路由搜索",
-                "size": "sm"
+                "placeholder": "通过关键词搜索",
+                "size": "lg"
               }
             ]
           }
@@ -111,94 +127,50 @@
           }
         ]
       },
-      "tableLayout": "fixed",
       "columns": [
         {
-          "label": "ID",
-          "name": "id",
-          "width": 70
+          "label": "HTTP方法",
+          "name": "method",
+          "type": "mapping",
+          "map": {
+            "*": "<span class='label' style='background-color: #ff5252; color: white;'>*</span>",
+            "GET": "<span class='label' style='background-color: #2196f3; color: white;'>GET</span>",
+            "POST": "<span class='label' style='background-color: #4caf50; color: white;'>POST</span>",
+            "PUT": "<span class='label' style='background-color: #ff9800; color: white;'>PUT</span>",
+            "DELETE": "<span class='label' style='background-color: #f44336; color: white;'>DELETE</span>",
+            "HEAD": "<span class='label' style='background-color: #9e9e9e; color: white;'>HEAD</span>",
+            "OPTIONS": "<span class='label' style='background-color: #673ab7; color: white;'>OPTIONS</span>",
+            "PATCH": "<span class='label' style='background-color: #ff5722; color: white;'>PATCH</span>",
+            "TRACE": "<span class='label' style='background-color: #ffc107; color: white;'>TRACE</span>"
+          }
         },
         {
           "label": "路由",
-          "name": "route",
-          "width": 80,
+          "name": "routing",
           "type": "tpl",
-          "tpl": "<div style='background-color: #f2f4f8; padding: 5px; border-radius: 4px; text-align: center;'>${route}</div>"
-        },
-        {
-          "name": "method",
-          "label": "Method",
-          "type": "mapping",
-          "map": {
-            "GET": "<span class='label label-info'>GET</span>",
-            "POST": "<span class='label label-success'>POST</span>",
-            "PUT": "<span class='label label-warning'>PUT</span>",
-            "DELETE": "<span class='label label-danger'>DELETE</span>"
-          },
-          "width": 50
+          "tpl": "<div style='background-color: #f2f4f8; padding: 5px; font-weight: bold;border-radius: 4px; text-align: center;'>${routing}</div>"
         },
         {
           "type": "operation",
           "label": "操作",
           "fixed": "right",
-          "width": 100,
           "buttons": [
             {
               "type": "button",
-              "icon": "fa fa-pencil",
-              "tooltip": "编辑",
-              "actionType": "dialog",
-              "dialog": {
-                "title": "编辑",
-                "body": {
-                  "type": "form",
-                  "api": "patch:/waf/api/v1/routing/$id",
-                  "body": [
-                    {
-                      "type": "input-text",
-                      "name": "route",
-                      "label": "路由",
-                      "required": true
-                    },
-                    {
-                      "type": "select",
-                      "name": "method",
-                      "label": "Method",
-                      "required": true,
-                      "options": [
-                        {
-                          "label": "GET",
-                          "value": "GET"
-                        },
-                        {
-                          "label": "POST",
-                          "value": "POST"
-                        },
-                        {
-                          "label": "PUT",
-                          "value": "PUT"
-                        },
-                        {
-                          "label": "DELETE",
-                          "value": "DELETE"
-                        },
-                        {
-                          "label": "PATCH",
-                          "value": "PATCH"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "type": "button",
-              "icon": "fa fa-times text-danger",
+              "label": "删除",
+              "level": "danger",
               "actionType": "ajax",
               "tooltip": "删除",
               "confirmText": "确认要删除?",
-              "api": "delete:/waf/api/v1/routing/$id"
+              "api": {
+                "method": "delete",
+                "url": "/waf/api/v1/routing",
+                "data": {
+                  "method": "${method}",
+                  "routing": "${routing}",
+                  "type": 1
+                }
+              }
             }
           ]
         }

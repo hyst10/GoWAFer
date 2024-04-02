@@ -14,6 +14,8 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"log"
 	"net/http"
 	"os"
@@ -38,6 +40,7 @@ func main() {
 		panic(fmt.Sprintf("数据库连接失败：%v", err))
 	}
 	log.Println("数据库连接成功")
+	rdb := database.InitRedis()
 
 	// 创建一个协程用于管理过期的黑白名单IP
 	go func() {
@@ -81,13 +84,13 @@ func main() {
 	r.LoadHTMLGlob("templates/**")
 
 	// swagger 文档
-	//r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// 注册页面路由
 	web.RegisterWebHandler(r, db, conf)
 
 	// 注册API路由、注册反向代理路由
-	api.RegisterAllHandlers(r, db, conf)
+	api.RegisterAllHandlers(r, db, rdb, conf)
 
 	// 创建一个监听系统终止信号的通道
 	stopChan := make(chan os.Signal, 1)

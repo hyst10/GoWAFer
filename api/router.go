@@ -7,6 +7,7 @@ import (
 	"GoWAFer/internal/service"
 	"GoWAFer/pkg/config"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 	"log"
 	"net/http/httputil"
@@ -15,33 +16,34 @@ import (
 )
 
 type Databases struct {
-	adminRepository     *repository.AdminRepository
-	logRepository       *repository.LogRepository
-	ipRepository        *repository.IPRepository
-	routingRepository   *repository.RoutingRepository
-	sqlInjectRepository *repository.SqlInjectRepository
-	xssDetectRepository *repository.XssDetectRepository
+	adminRepository         *repository.AdminRepository
+	logRepository           *repository.LogRepository
+	ipRepository            *repository.IPRepository
+	routingManageRepository *repository.RoutingManageRepository
+	sqlInjectRepository     *repository.SqlInjectRepository
+	xssDetectRepository     *repository.XssDetectRepository
 }
 
-func NewDatabases(db *gorm.DB) *Databases {
+func NewDatabases(db *gorm.DB, rdb *redis.Client) *Databases {
 	return &Databases{
-		adminRepository:     repository.NewAdminRepository(db),
-		logRepository:       repository.NewLogRepository(db),
-		ipRepository:        repository.NewIPRepository(db),
-		routingRepository:   repository.NewRoutingRepository(db),
-		sqlInjectRepository: repository.NewSqlInjectRepository(db),
-		xssDetectRepository: repository.NewXssDetectRepository(db),
+		adminRepository:         repository.NewAdminRepository(db),
+		logRepository:           repository.NewLogRepository(db),
+		ipRepository:            repository.NewIPRepository(db),
+		routingManageRepository: repository.NewRoutingManageRepository(rdb),
+		sqlInjectRepository:     repository.NewSqlInjectRepository(db),
+		xssDetectRepository:     repository.NewXssDetectRepository(db),
 	}
 }
 
-func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, conf *config.Config) {
-	dbs := NewDatabases(db)
+func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, rdb *redis.Client, conf *config.Config) {
+	dbs := NewDatabases(db, rdb)
 
 	apiGroup := r.Group("/waf/api/v1")
+	apiGroup.Use(middleware.ErrorHandlingMiddleware()) // 错误处理中间件
 
 	RegisterUserHandler(apiGroup, dbs, conf)
 	RegisterIPHandler(apiGroup, dbs, conf)
-	RegisterRoutingHandler(apiGroup, dbs, conf)
+	RegisterRoutingManageHandler(apiGroup, dbs, conf)
 	RegisterLogHandler(apiGroup, dbs, conf)
 	RegisterConfigHandler(apiGroup, dbs, conf)
 	RegisterSqlInjectHandler(apiGroup, dbs, conf)
@@ -54,7 +56,7 @@ func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, conf *config.Config) {
 	r.Use(middleware.IPManager(dbs.ipRepository))
 	log.Println("IP管理中间件加载成功")
 	// 添加路由守卫中间件
-	r.Use(middleware.RouteGuardMiddleware(dbs.routingRepository))
+	r.Use(middleware.RouteGuardMiddleware(dbs.routingManageRepository))
 	log.Println("路由守卫中间件加载成功")
 	// 添加限速器中间件
 	r.Use(middleware.RateLimitMiddleware(conf, dbs.ipRepository))
@@ -112,15 +114,15 @@ func RegisterIPHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) 
 	ipGroup.DELETE(":id", ipController.DeleteIP)
 }
 
-func RegisterRoutingHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
-	routingService := service.NewRoutingService(dbs.routingRepository)
-	routingController := controller.NewRoutingController(routingService)
+// RegisterRoutingManageHandler 注册路由管理方法
+func RegisterRoutingManageHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
+	routingManageService := service.NewRoutingManageService(dbs.routingManageRepository)
+	routingManageController := controller.NewRoutingManageController(routingManageService)
 	routingGroup := r.Group("/routing")
 	routingGroup.Use(middleware.WafAPIAuthMiddleware(conf.Secret.JwtSecretKey, dbs.adminRepository))
-	routingGroup.POST("", routingController.CreateRouting)
-	routingGroup.GET("", routingController.FindPaginatedRouting)
-	routingGroup.PATCH(":id", routingController.UpdateRouting)
-	routingGroup.DELETE(":id", routingController.DeleteRouting)
+	routingGroup.POST("", routingManageController.AddRouting)
+	routingGroup.GET("", routingManageController.GetRouting)
+	routingGroup.DELETE("", routingManageController.DeleteRouting)
 }
 
 func RegisterLogHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {

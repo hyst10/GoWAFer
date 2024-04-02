@@ -4,7 +4,7 @@ import (
 	"GoWAFer/internal/model"
 	"GoWAFer/internal/repository"
 	"GoWAFer/pkg/config"
-	"GoWAFer/pkg/utils/api_handler"
+	"GoWAFer/pkg/utils/api_helper"
 	"github.com/gin-gonic/gin"
 	"sync"
 	"time"
@@ -34,7 +34,7 @@ func RateLimitMiddleware(conf *config.Config, repo *repository.IPRepository) gin
 		if !limiter.Allow(clientIP, conf, repo) {
 			c.Set("BlockedBy", "CC攻击防护中间件")
 			c.Set("BlockReason", "客户端IP访问频率过高")
-			api_handler.ForbiddenHandler(c, "访问过于频繁，请稍后再试！")
+			api_helper.ForbiddenHandler(c, "访问过于频繁，请稍后再试！")
 			c.Abort()
 			return
 		}

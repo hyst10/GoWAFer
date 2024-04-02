@@ -21,12 +21,6 @@ func migrate(db *gorm.DB) {
 	}
 	log.Println("IP表迁移成功")
 
-	err = db.AutoMigrate(&model.Routing{})
-	if err != nil {
-		panic(fmt.Sprintf("路由管理表创建失败：%v", err))
-	}
-	log.Println("路由表迁移成功")
-
 	err = db.AutoMigrate(&model.Log{})
 	if err != nil {
 		panic(fmt.Sprintf("流量日志表创建失败：%v", err))

@@ -3,7 +3,7 @@ package controller
 import (
 	"GoWAFer/internal/service"
 	"GoWAFer/pkg/pagination"
-	"GoWAFer/pkg/utils/api_handler"
+	"GoWAFer/pkg/utils/api_helper"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -25,13 +25,13 @@ func NewLogController(logService *service.LogService) *LogController {
 // @Tags Log（日志模块）
 // @Produce json
 // @Param days query string false "查询范围天数"
-// @Success 200 {object} api_handler.Response
+// @Success 200 {object} api_helper.Response
 // @Router /waf/api/v1/log [get]
 func (c *LogController) FindLogs(g *gin.Context) {
 	days := g.DefaultQuery("days", "0.5")
 	dayFloat, err := strconv.ParseFloat(days, 64)
 	if err != nil {
-		api_handler.ClientErrorHandler(g, 40004)
+		api_helper.ClientErrorHandler(g, 40004)
 		return
 	}
 	var hours int
@@ -39,7 +39,7 @@ func (c *LogController) FindLogs(g *gin.Context) {
 		hours = 2
 	}
 	items := c.logService.FindLogs(int(dayFloat), hours)
-	g.JSON(http.StatusOK, api_handler.Response{Status: 0, Message: "success", Data: items})
+	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "success", Data: items})
 }
 
 // FindPaginatedBlockedLog godoc
@@ -50,12 +50,12 @@ func (c *LogController) FindLogs(g *gin.Context) {
 // @Param keywords query string false "查询IP"
 // @Param page query int false "页码"
 // @Param perPage query int false "页面大小"
-// @Success 200 {object} api_handler.Response
+// @Success 200 {object} api_helper.Response
 // @Router /waf/api/v1/log/getBlockLog [get]
 func (c *LogController) FindPaginatedBlockedLog(g *gin.Context) {
 	// 通过请求实例化分页结构体
 	page := pagination.NewFromRequest(g)
 	keyword := g.Query("keywords")
 	page = c.logService.FindPaginatedLogs(page, keyword)
-	g.JSON(http.StatusOK, api_handler.Response{Status: 0, Message: "success", Data: page})
+	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "success", Data: page})
 }
