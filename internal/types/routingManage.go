@@ -6,14 +6,14 @@ type RouteInfo struct {
 	Method  string `json:"method"`  // HTTP 方法
 }
 
-// AddRoutingRequest 新增路由管理请求
+// AddRoutingRequest 添加路由请求
 type AddRoutingRequest struct {
 	Routing string `json:"routing" binding:"required"`
 	Type    int    `json:"type" binding:"required"`
 	Method  string `json:"method" binding:"required"`
 }
 
-// DeleteRoutingRequest 删除路由管理请求
+// DeleteRoutingRequest 删除路由请求
 type DeleteRoutingRequest struct {
 	Routing string `json:"routing" binding:"required"`
 	Type    int    `json:"type" binding:"required"`

@@ -5,6 +5,8 @@ import (
 	"GoWAFer/internal/middleware"
 	"GoWAFer/internal/repository"
 	"GoWAFer/internal/service"
+	"GoWAFer/internal/types"
+	"GoWAFer/pkg/cache"
 	"GoWAFer/pkg/config"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -18,7 +20,7 @@ import (
 type Databases struct {
 	adminRepository         *repository.AdminRepository
 	logRepository           *repository.LogRepository
-	ipRepository            *repository.IPRepository
+	ipManageRepository      *repository.IPManageRepository
 	routingManageRepository *repository.RoutingManageRepository
 	sqlInjectRepository     *repository.SqlInjectRepository
 	xssDetectRepository     *repository.XssDetectRepository
@@ -28,10 +30,10 @@ func NewDatabases(db *gorm.DB, rdb *redis.Client) *Databases {
 	return &Databases{
 		adminRepository:         repository.NewAdminRepository(db),
 		logRepository:           repository.NewLogRepository(db),
-		ipRepository:            repository.NewIPRepository(db),
+		ipManageRepository:      repository.NewIPManageRepository(rdb),
 		routingManageRepository: repository.NewRoutingManageRepository(rdb),
-		sqlInjectRepository:     repository.NewSqlInjectRepository(db),
-		xssDetectRepository:     repository.NewXssDetectRepository(db),
+		sqlInjectRepository:     repository.NewSqlInjectRepository(rdb),
+		xssDetectRepository:     repository.NewXssDetectRepository(rdb),
 	}
 }
 
@@ -53,38 +55,41 @@ func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, rdb *redis.Client, conf *co
 	r.Use(middleware.TrafficLogger(dbs.logRepository))
 	log.Println("日志中间件加载成功")
 	// 添加IP管理中间件
-	r.Use(middleware.IPManager(dbs.ipRepository))
+	r.Use(middleware.IPManager(dbs.ipManageRepository))
 	log.Println("IP管理中间件加载成功")
 	// 添加路由守卫中间件
 	r.Use(middleware.RouteGuardMiddleware(dbs.routingManageRepository))
 	log.Println("路由守卫中间件加载成功")
 	// 添加限速器中间件
-	r.Use(middleware.RateLimitMiddleware(conf, dbs.ipRepository))
+	r.Use(middleware.RateLimitMiddleware(conf, dbs.ipManageRepository))
 	log.Println("CC攻击防护中间件加载成功")
 	// 添加CSRFToken中间件
 	r.Use(middleware.CsrfTokenMiddleware())
 	log.Println("CSRFToken中间件加载成功")
 	// 加载sql注入防护规则
-	sqlInjectRules := dbs.sqlInjectRepository.FindAll()
-	var sqlInject []*regexp.Regexp
+	err := cache.ImportRulesFromCSV(rdb, "./rules/sqlInjectRules.csv", repository.SqlInjectRules)
+	if err != nil {
+		panic(err)
+	}
+	sqlInjectRules, _ := dbs.sqlInjectRepository.GetAll()
 	for _, rule := range sqlInjectRules {
 		compile := regexp.MustCompile(rule.Rule)
-		sqlInject = append(sqlInject, compile)
+		types.SqlInjectRules = append(types.SqlInjectRules, compile)
 	}
 	log.Println("sql注入防护规则加载成功")
 	// 添加sql注入检测中间件
-	r.Use(middleware.SqlInjectMiddleware(sqlInject))
+	r.Use(middleware.SqlInjectMiddleware())
 	log.Println("sql注入防护中间件加载成功")
 	// 加载xss攻击防护规则
-	xssDetectRules := dbs.xssDetectRepository.FindAll()
-	var xssDetect []*regexp.Regexp
-	for _, rule := range xssDetectRules {
-		compile := regexp.MustCompile(rule.Rule)
-		xssDetect = append(xssDetect, compile)
-	}
+	//xssDetectRules := dbs.xssDetectRepository.FindAll()
+	//var xssDetect []*regexp.Regexp
+	//for _, rule := range xssDetectRules {
+	//	compile := regexp.MustCompile(rule.Rule)
+	//	xssDetect = append(xssDetect, compile)
+	//}
 	log.Println("xss攻击防护规则加载成功")
 	// 添加xss攻击检测中间件
-	r.Use(middleware.XSSDetectMiddleware(xssDetect))
+	r.Use(middleware.XSSDetectMiddleware())
 	log.Println("xss攻击防护中间件加载成功")
 
 	// 设置反向代理
@@ -103,15 +108,15 @@ func RegisterUserHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config
 	authGroup.GET("/getCaptcha", userController.GetCaptcha)
 }
 
+// RegisterIPHandler 注册IP管理方法
 func RegisterIPHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
-	ipService := service.NewIPListService(dbs.ipRepository)
-	ipController := controller.NewIPController(ipService)
-	ipGroup := r.Group("/ip")
-	ipGroup.Use(middleware.WafAPIAuthMiddleware(conf.Secret.JwtSecretKey, dbs.adminRepository))
-	ipGroup.POST("", ipController.CreateIP)
-	ipGroup.GET("", ipController.FindPaginatedIP)
-	ipGroup.PATCH(":id", ipController.UpdateIP)
-	ipGroup.DELETE(":id", ipController.DeleteIP)
+	ipManageService := service.NewIPManageService(dbs.ipManageRepository)
+	ipManageController := controller.NewIPManageController(ipManageService)
+	ipManageGroup := r.Group("/ip")
+	ipManageGroup.Use(middleware.WafAPIAuthMiddleware(conf.Secret.JwtSecretKey, dbs.adminRepository))
+	ipManageGroup.POST("", ipManageController.AddIP)
+	ipManageGroup.GET("", ipManageController.FindPaginatedIP)
+	ipManageGroup.DELETE("", ipManageController.DeleteIP)
 }
 
 // RegisterRoutingManageHandler 注册路由管理方法
@@ -142,24 +147,24 @@ func RegisterConfigHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Conf
 	configGroup.PUT("", configController.UpdateConfig)
 }
 
+// RegisterSqlInjectHandler 注册sql注入防护方法
 func RegisterSqlInjectHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
 	sqlInjectService := service.NewSqlInjectService(dbs.sqlInjectRepository)
 	sqlInjectController := controller.NewSqlInjectController(sqlInjectService)
 	sqlInjectGroup := r.Group("/sqlInject")
 	sqlInjectGroup.Use(middleware.WafAPIAuthMiddleware(conf.Secret.JwtSecretKey, dbs.adminRepository))
-	sqlInjectGroup.GET("", sqlInjectController.FindPaginatedSqlInject)
+	sqlInjectGroup.GET("", sqlInjectController.GetAllSqlInjectRules)
 	sqlInjectGroup.POST("", sqlInjectController.CreateRule)
-	sqlInjectGroup.PATCH(":id", sqlInjectController.UpdateRule)
-	sqlInjectGroup.DELETE(":id", sqlInjectController.DeleteRule)
+	sqlInjectGroup.DELETE("", sqlInjectController.DeleteRule)
 }
 
+// RegisterXssDetectHandler 注册xss攻击防护方法
 func RegisterXssDetectHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
 	xssDetectService := service.NewXssDetectService(dbs.xssDetectRepository)
 	xssDetectController := controller.NewXssDetectController(xssDetectService)
 	xssDetectGroup := r.Group("/xssDetect")
 	xssDetectGroup.Use(middleware.WafAPIAuthMiddleware(conf.Secret.JwtSecretKey, dbs.adminRepository))
-	xssDetectGroup.GET("", xssDetectController.FindPaginatedSqlInject)
+	xssDetectGroup.GET("", xssDetectController.GetAllRules)
 	xssDetectGroup.POST("", xssDetectController.CreateRule)
-	xssDetectGroup.PATCH(":id", xssDetectController.UpdateRule)
-	xssDetectGroup.DELETE(":id", xssDetectController.DeleteRule)
+	xssDetectGroup.DELETE("", xssDetectController.DeleteRule)
 }

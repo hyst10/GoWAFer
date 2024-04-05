@@ -133,6 +133,7 @@
           "name": "method",
           "type": "mapping",
           "map": {
+            "default": "<span class='label' style='background-color: #ff5252; color: white;'>*</span>",
             "*": "<span class='label' style='background-color: #ff5252; color: white;'>*</span>",
             "GET": "<span class='label' style='background-color: #2196f3; color: white;'>GET</span>",
             "POST": "<span class='label' style='background-color: #4caf50; color: white;'>POST</span>",

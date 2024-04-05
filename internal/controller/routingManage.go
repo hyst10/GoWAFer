@@ -38,7 +38,7 @@ func (c *RoutingManageController) AddRouting(g *gin.Context) {
 	}
 
 	// 检查路由格式是否正确
-	if !utils.ValidatorRouting(req.Routing) {
+	if !utils.ValidateRouting(req.Routing) {
 		g.Error(types.ErrRoutingNotMatch)
 		return
 	}
@@ -78,11 +78,11 @@ func (c *RoutingManageController) GetRouting(g *gin.Context) {
 // @Tags Routing
 // @Accept json
 // @Product json
-// @Param types.AddRoutingRequest body types.AddRoutingRequest true "请求体"
+// @Param types.DeleteRoutingRequest body types.DeleteRoutingRequest true "请求体"
 // @Success 200 {object} api_helper.Response
 // @Router /waf/api/v1/routing [delete]
 func (c *RoutingManageController) DeleteRouting(g *gin.Context) {
-	var req types.AddRoutingRequest
+	var req types.DeleteRoutingRequest
 	if err := g.ShouldBindJSON(&req); err != nil {
 		g.Error(types.ErrInvalidBody)
 		return

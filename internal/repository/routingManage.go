@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	blackRoutingKey = "blackRoutingList" // 黑名单路由集合
-	whiteRoutingKey = "whiteRoutingList" // 白名单路由集合
+	blackRoutingKey = "blackRoutingList" // 黑名单路由
+	whiteRoutingKey = "whiteRoutingList" // 白名单路由
 )
 
 // RoutingManageRepository 路由管理仓库接口
@@ -28,7 +28,7 @@ func NewRoutingManageRepository(rdb *redis.Client) *RoutingManageRepository {
 }
 
 // 生成key
-func generateKey(rType int) string {
+func generateRoutingKey(rType int) string {
 	switch rType {
 	case 1:
 		return blackRoutingKey
@@ -41,19 +41,19 @@ func generateKey(rType int) string {
 
 // Add 新增一条路由管理记录，设置过期时间储存到redis中
 func (r *RoutingManageRepository) Add(routing, method string, routingType int) error {
-	key := fmt.Sprintf("%s:%s:%s", generateKey(routingType), routing, method)
+	key := fmt.Sprintf("%s:%s:%s", generateRoutingKey(routingType), routing, method)
 	return r.rdb.Set(r.ctx, key, 1, 0).Err()
 }
 
 // Del 删除一条路由管理记录
 func (r *RoutingManageRepository) Del(routing, method string, routingType int) error {
-	key := fmt.Sprintf("%s:%s:%s", generateKey(routingType), routing, method)
+	key := fmt.Sprintf("%s:%s:%s", generateRoutingKey(routingType), routing, method)
 	return r.rdb.Del(r.ctx, key).Err()
 }
 
-// GetAllWithPagination 分页查询路由管理记录，并查询生存时间
+// GetAllWithPagination 分页查询路由管理记录
 func (r *RoutingManageRepository) GetAllWithPagination(page, pageSize, routingType int, keywords string) ([]types.RouteInfo, int) {
-	keyHeader := generateKey(routingType)
+	keyHeader := generateRoutingKey(routingType)
 	startIndex := (page - 1) * pageSize
 	endIndex := startIndex + pageSize - 1
 	var keys []string
@@ -91,7 +91,7 @@ func (r *RoutingManageRepository) GetAllWithPagination(page, pageSize, routingTy
 
 // IsExist 判断路由记录是否存在
 func (r *RoutingManageRepository) IsExist(routing, method string, routingType int) (bool, error) {
-	key := fmt.Sprintf("%s:%s:%s", generateKey(routingType), routing, method)
+	key := fmt.Sprintf("%s:%s:%s", generateRoutingKey(routingType), routing, method)
 	result, err := r.rdb.Exists(r.ctx, key).Result()
 	if err != nil {
 		return false, err

@@ -1,13 +1,13 @@
 package middleware
 
 import (
+	"GoWAFer/internal/types"
 	"GoWAFer/pkg/utils/api_helper"
 	"github.com/gin-gonic/gin"
-	"regexp"
 )
 
 // XSSDetectMiddleware 检测xss攻击的中间件
-func XSSDetectMiddleware(rules []*regexp.Regexp) gin.HandlerFunc {
+func XSSDetectMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 检查是否为白名单IP
 		if skip, _ := c.Get("isWhiteListIP"); skip == true {
@@ -25,7 +25,7 @@ func XSSDetectMiddleware(rules []*regexp.Regexp) gin.HandlerFunc {
 		query := c.Request.URL.Query()
 		for _, values := range query {
 			for _, value := range values {
-				for _, pattern := range rules {
+				for _, pattern := range types.XssDetectRules {
 					if pattern.MatchString(value) {
 						c.Set("BlockedBy", "xss攻击防护中间件")
 						c.Set("BlockReason", "查询参数中检测到xss攻击")
@@ -43,7 +43,7 @@ func XSSDetectMiddleware(rules []*regexp.Regexp) gin.HandlerFunc {
 			if err := c.Request.ParseForm(); err == nil {
 				for _, values := range c.Request.PostForm {
 					for _, value := range values {
-						for _, pattern := range rules {
+						for _, pattern := range types.XssDetectRules {
 							if pattern.MatchString(value) {
 								c.Set("BlockedBy", "xss攻击防护中间件")
 								c.Set("BlockReason", "表单数据中检测到xss攻击")

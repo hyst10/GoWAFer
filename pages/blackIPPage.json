@@ -16,20 +16,21 @@
           "body": [
             {
               "type": "input-text",
-              "name": "ip-address",
+              "name": "ip",
               "label": "IP",
               "required": true
             },
             {
               "type": "hidden",
               "name": "type",
-              "value": 2,
+              "value": 1,
               "required": true
             },
             {
-              "type": "input-datetime",
-              "name": "expirationAt",
-              "label": "过期时间",
+              "type": "input-number",
+              "name": "expiration",
+              "label": "TTL",
+              "labelRemark": "生存时间，单位为秒",
               "required": true
             }
           ]
@@ -40,7 +41,7 @@
   "body": [
     {
       "type": "crud",
-      "api": "/waf/api/v1/ip?page=${page}&perPage=${perPage}&keywords=${keywords}&type=2",
+      "api": "/waf/api/v1/ip?page=${page}&perPage=${perPage}&keywords=${keywords}&type=1",
       "defaultParams": {
         "perPage": 10
       },
@@ -68,10 +69,10 @@
               {
                 "type": "input-text",
                 "name": "keywords",
-                "label": "IP",
+                "label": "关键词",
                 "clearable": true,
-                "placeholder": "通过IP搜索",
-                "size": "sm"
+                "placeholder": "通过关键词搜索",
+                "size": "lg"
               }
             ]
           }
@@ -88,73 +89,36 @@
           }
         ]
       },
-      "tableLayout": "fixed",
       "columns": [
         {
-          "label": "ID",
-          "name": "id",
-          "width": 70
-        },
-        {
           "label": "IP",
-          "name": "ip_address",
-          "width": 50,
+          "name": "ip",
           "copyable": true
         },
         {
-          "label": "添加时间",
-          "name": "created_at",
-          "type": "date",
-          "format": "YYYY年MM月DD日 HH时mm分ss秒",
-          "width": 50
-        },
-        {
           "label": "过期时间",
-          "name": "expiration_at",
-          "type": "date",
-          "format": "YYYY年MM月DD日 HH时mm分ss秒",
-          "width": 50
+          "name": "expiration"
         },
         {
           "type": "operation",
           "label": "操作",
           "fixed": "right",
-          "width": 100,
           "buttons": [
             {
               "type": "button",
-              "icon": "fa fa-pencil",
-              "tooltip": "编辑",
-              "actionType": "dialog",
-              "dialog": {
-                "title": "编辑",
-                "body": {
-                  "type": "form",
-                  "api": "patch:/waf/api/v1/ip/$id",
-                  "body": [
-                    {
-                      "type": "input-text",
-                      "name": "ip_address",
-                      "label": "IP",
-                      "required": true
-                    },
-                    {
-                      "type": "input-datetime",
-                      "name": "expiration_at",
-                      "label": "过期时间",
-                      "required": true
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "type": "button",
-              "icon": "fa fa-times text-danger",
+              "label": "删除",
+              "level": "danger",
               "actionType": "ajax",
               "tooltip": "删除",
               "confirmText": "确认要删除?",
-              "api": "delete:/waf/api/v1/ip/$id"
+              "api": {
+                "method": "delete",
+                "url": "/waf/api/v1/ip",
+                "data": {
+                  "ip": "${ip}",
+                  "type": 1
+                }
+              }
             }
           ]
         }

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"GoWAFer/internal/model"
 	"GoWAFer/internal/repository"
 	"GoWAFer/pkg/config"
 	"GoWAFer/pkg/utils/api_helper"
@@ -13,7 +12,7 @@ import (
 var ipLimitersMutex sync.Mutex
 var ipLimiters = make(map[string]RLInterface)
 
-func RateLimitMiddleware(conf *config.Config, repo *repository.IPRepository) gin.HandlerFunc {
+func RateLimitMiddleware(conf *config.Config, repo *repository.IPManageRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 检查是否为白名单IP
 		if skip, _ := c.Get("isWhiteListIP"); skip == true {
@@ -43,25 +42,21 @@ func RateLimitMiddleware(conf *config.Config, repo *repository.IPRepository) gin
 }
 
 type RLInterface interface {
-	Allow(ip string, conf *config.Config, rep *repository.IPRepository) bool
+	Allow(ip string, conf *config.Config, rep *repository.IPManageRepository) bool
 }
 
 // Allow 令牌桶算法
-func (rl *TokenBucket) Allow(ip string, conf *config.Config, rep *repository.IPRepository) bool {
+func (rl *TokenBucket) Allow(ip string, conf *config.Config, rep *repository.IPManageRepository) bool {
 	// 检查计数器是否超过最大值
 	if rl.Counter > conf.RateLimiter.MaxCounter {
-		// 将IP拉入长期黑名单
-		expiration := time.Now().AddDate(1, 0, 0)
-		current := model.IP{Type: 2, IPAddress: ip, ExpirationAt: expiration}
-		rep.Create(&current)
+		// 将IP拉入永久黑名单
+		rep.Add(ip, 0, 1)
 		rl.Counter = 0
 		return false
 	}
 	if rl.Counter > conf.RateLimiter.BanCounter {
 		// 将IP封禁一段时间
-		expiration := time.Now().Add(time.Duration(conf.RateLimiter.BanDuration) * time.Second)
-		current := model.IP{Type: 2, IPAddress: ip, ExpirationAt: expiration}
-		rep.Create(&current)
+		rep.Add(ip, conf.RateLimiter.BanDuration, 1)
 		rl.Counter = 0
 		return false
 	}
@@ -91,21 +86,17 @@ func (rl *TokenBucket) Allow(ip string, conf *config.Config, rep *repository.IPR
 }
 
 // Allow 漏桶算法
-func (rl *LeakyBucket) Allow(ip string, conf *config.Config, rep *repository.IPRepository) bool {
+func (rl *LeakyBucket) Allow(ip string, conf *config.Config, rep *repository.IPManageRepository) bool {
 	// 检查计数器是否超过最大值
 	if rl.Counter > conf.RateLimiter.MaxCounter {
-		// 将IP拉入长期黑名单
-		expiration := time.Now().AddDate(1, 0, 0)
-		current := model.IP{Type: 2, IPAddress: ip, ExpirationAt: expiration}
-		rep.Create(&current)
+		// 将IP拉入永久黑名单
+		rep.Add(ip, 0, 1)
 		rl.Counter = 0
 		return false
 	}
 	if rl.Counter > conf.RateLimiter.BanCounter {
 		// 将IP封禁一段时间
-		expiration := time.Now().Add(time.Duration(conf.RateLimiter.BanDuration) * time.Second)
-		current := model.IP{Type: 2, IPAddress: ip, ExpirationAt: expiration}
-		rep.Create(&current)
+		rep.Add(ip, conf.RateLimiter.BanDuration, 1)
 		rl.Counter = 0
 		return false
 	}
@@ -139,21 +130,17 @@ func (rl *LeakyBucket) Allow(ip string, conf *config.Config, rep *repository.IPR
 }
 
 // Allow 固定窗口算法
-func (rl *FixedWindow) Allow(ip string, conf *config.Config, rep *repository.IPRepository) bool {
+func (rl *FixedWindow) Allow(ip string, conf *config.Config, rep *repository.IPManageRepository) bool {
 	// 检查计数器是否超过最大值
 	if rl.Counter > conf.RateLimiter.MaxCounter {
-		// 将IP拉入长期黑名单
-		expiration := time.Now().AddDate(1, 0, 0)
-		current := model.IP{Type: 2, IPAddress: ip, ExpirationAt: expiration}
-		rep.Create(&current)
+		// 将IP拉入永久黑名单
+		rep.Add(ip, 0, 1)
 		rl.Counter = 0
 		return false
 	}
 	if rl.Counter > conf.RateLimiter.BanCounter {
 		// 将IP封禁一段时间
-		expiration := time.Now().Add(time.Duration(conf.RateLimiter.BanDuration) * time.Second)
-		current := model.IP{Type: 2, IPAddress: ip, ExpirationAt: expiration}
-		rep.Create(&current)
+		rep.Add(ip, conf.RateLimiter.BanDuration, 1)
 		rl.Counter = 0
 		return false
 	}
@@ -178,21 +165,17 @@ func (rl *FixedWindow) Allow(ip string, conf *config.Config, rep *repository.IPR
 }
 
 // Allow 滑动窗口算法
-func (rl *SlidingWindow) Allow(ip string, conf *config.Config, rep *repository.IPRepository) bool {
+func (rl *SlidingWindow) Allow(ip string, conf *config.Config, rep *repository.IPManageRepository) bool {
 	// 检查计数器是否超过最大值
 	if rl.Counter > conf.RateLimiter.MaxCounter {
-		// 将IP拉入长期黑名单
-		expiration := time.Now().AddDate(1, 0, 0)
-		current := model.IP{Type: 2, IPAddress: ip, ExpirationAt: expiration}
-		rep.Create(&current)
+		// 将IP拉入永久黑名单
+		rep.Add(ip, 0, 1)
 		rl.Counter = 0
 		return false
 	}
 	if rl.Counter > conf.RateLimiter.BanCounter {
 		// 将IP封禁一段时间
-		expiration := time.Now().Add(time.Duration(conf.RateLimiter.BanDuration) * time.Second)
-		current := model.IP{Type: 2, IPAddress: ip, ExpirationAt: expiration}
-		rep.Create(&current)
+		rep.Add(ip, conf.RateLimiter.BanDuration, 1)
 		rl.Counter = 0
 		return false
 	}

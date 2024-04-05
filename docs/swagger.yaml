@@ -1,29 +1,4 @@
 definitions:
-  api_helper.CreateIPRequest:
-    properties:
-      expirationAt:
-        type: string
-      ip-address:
-        type: string
-      type:
-        type: integer
-    required:
-    - ip-address
-    type: object
-  api_helper.CreateSqlInjectRequest:
-    properties:
-      rule:
-        type: string
-    required:
-    - rule
-    type: object
-  api_helper.CreateXssDetectRequest:
-    properties:
-      rule:
-        type: string
-    required:
-    - rule
-    type: object
   api_helper.LoginRequest:
     properties:
       captcha:
@@ -48,15 +23,6 @@ definitions:
         type: string
       status:
         type: integer
-    type: object
-  api_helper.UpdateIPRequest:
-    properties:
-      expiration_at:
-        type: string
-      ip_address:
-        type: string
-    required:
-    - ip_address
     type: object
   config.Config:
     properties:
@@ -129,18 +95,79 @@ definitions:
             type: string
         type: object
     type: object
+  types.AddIPRequest:
+    properties:
+      expiration:
+        type: integer
+      ip:
+        type: string
+      type:
+        type: integer
+    required:
+    - ip
+    - type
+    type: object
   types.AddRoutingRequest:
     properties:
       method:
         type: string
-      route:
+      routing:
         type: string
       type:
         type: integer
     required:
     - method
-    - route
+    - routing
     - type
+    type: object
+  types.AddSqlInjectRuleRequest:
+    properties:
+      rule:
+        type: string
+    required:
+    - rule
+    type: object
+  types.DeleteIPRequest:
+    properties:
+      ip:
+        type: string
+      type:
+        type: integer
+    required:
+    - ip
+    - type
+    type: object
+  types.DeleteRoutingRequest:
+    properties:
+      method:
+        type: string
+      routing:
+        type: string
+      type:
+        type: integer
+    required:
+    - method
+    - routing
+    - type
+    type: object
+  types.DeleteSqlInjectRuleRequest:
+    properties:
+      rule:
+        type: string
+    required:
+    - rule
+    type: object
+  types.DeleteXssDetectRuleRequest:
+    properties:
+      rule:
+        type: string
+    required:
+    - rule
+    type: object
+  types.XssDetectRule:
+    properties:
+      rule:
+        type: string
     type: object
 info:
   contact: {}
@@ -219,8 +246,27 @@ paths:
       tags:
       - Config
   /waf/api/v1/ip:
+    delete:
+      consumes:
+      - application/json
+      description: 删除IP记录
+      parameters:
+      - description: 请求体
+        in: body
+        name: types.DeleteIPRequest
+        required: true
+        schema:
+          $ref: '#/definitions/types.DeleteIPRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_helper.Response'
+      summary: 删除IP记录
+      tags:
+      - IP
     get:
-      description: 分页查询IP
+      description: 分页查询IP管理记录
       parameters:
       - description: 关键词
         in: query
@@ -246,7 +292,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api_helper.Response'
-      summary: 分页查询IP
+      summary: 分页查询IP管理记录
       tags:
       - IP
     post:
@@ -256,59 +302,16 @@ paths:
       parameters:
       - description: 请求体
         in: body
-        name: api_helper.CreateIPRequest
+        name: types.AddIPRequest
         required: true
         schema:
-          $ref: '#/definitions/api_helper.CreateIPRequest'
+          $ref: '#/definitions/types.AddIPRequest'
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/api_helper.Response'
-      summary: 新增IP记录
-      tags:
-      - IP
-  /waf/api/v1/ip/{id}:
-    delete:
-      description: 删除IP
-      parameters:
-      - description: IP主键ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api_helper.Response'
-      summary: 删除IP
-      tags:
-      - IP
-    patch:
-      description: 编辑IP
-      parameters:
-      - description: IP主键ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: 请求体
-        in: body
-        name: api_helper.UpdateIPRequest
-        required: true
-        schema:
-          $ref: '#/definitions/api_helper.UpdateIPRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api_helper.Response'
-      summary: 编辑IP
+      summary: 新增IP管理记录
       tags:
       - IP
   /waf/api/v1/log:
@@ -363,10 +366,10 @@ paths:
       parameters:
       - description: 请求体
         in: body
-        name: types.AddRoutingRequest
+        name: types.DeleteRoutingRequest
         required: true
         schema:
-          $ref: '#/definitions/types.AddRoutingRequest'
+          $ref: '#/definitions/types.DeleteRoutingRequest'
       responses:
         "200":
           description: OK
@@ -425,21 +428,27 @@ paths:
       tags:
       - Routing
   /waf/api/v1/sqlInject:
-    get:
-      description: 分页查询SQL注入规则
+    delete:
+      consumes:
+      - application/json
+      description: 删除sql注入防护规则
       parameters:
-      - description: 关键词
-        in: query
-        name: keywords
-        type: string
-      - description: 页码
-        in: query
-        name: page
-        type: integer
-      - description: 页面大小
-        in: query
-        name: perPage
-        type: integer
+      - description: 请求体
+        in: body
+        name: types.DeleteSqlInjectRuleRequest
+        required: true
+        schema:
+          $ref: '#/definitions/types.DeleteSqlInjectRuleRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_helper.Response'
+      summary: 删除sql注入防护规则
+      tags:
+      - SqlInject
+    get:
+      description: 查询全部sql注入防护规则
       produces:
       - application/json
       responses:
@@ -447,87 +456,50 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api_helper.Response'
-      summary: 分页查询SQL注入规则
+      summary: 查询全部sql注入防护规则
       tags:
-      - SQlInject
+      - SqlInject
     post:
       consumes:
       - application/json
-      description: 新增sql注入规则
+      description: 新增sql注入防护规则
       parameters:
       - description: 请求体
         in: body
-        name: api_helper.CreateSqlInjectRequest
+        name: types.AddSqlInjectRuleRequest
         required: true
         schema:
-          $ref: '#/definitions/api_helper.CreateSqlInjectRequest'
+          $ref: '#/definitions/types.AddSqlInjectRuleRequest'
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/api_helper.Response'
-      summary: 新增sql注入规则
+      summary: 新增sql注入防护规则
       tags:
-      - SQlInject
-  /waf/api/v1/sqlInject/{id}:
-    delete:
-      description: 删除sql注入规则
-      parameters:
-      - description: 主键ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api_helper.Response'
-      summary: 删除sql注入规则
-      tags:
-      - SQlInject
-    patch:
-      description: 编辑sql注入规则
-      parameters:
-      - description: 主键ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: 请求体
-        in: body
-        name: api_helper.CreateSqlInjectRequest
-        required: true
-        schema:
-          $ref: '#/definitions/api_helper.CreateSqlInjectRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api_helper.Response'
-      summary: 编辑sql注入规则
-      tags:
-      - SQlInject
+      - SqlInject
   /waf/api/v1/xssDetect:
-    get:
-      description: 分页查询xss攻击匹配规则
+    delete:
+      consumes:
+      - application/json
+      description: 删除xss攻击防护规则
       parameters:
-      - description: 关键词
-        in: query
-        name: keywords
-        type: string
-      - description: 页码
-        in: query
-        name: page
-        type: integer
-      - description: 页面大小
-        in: query
-        name: perPage
-        type: integer
+      - description: 请求体
+        in: body
+        name: types.DeleteXssDetectRuleRequest
+        required: true
+        schema:
+          $ref: '#/definitions/types.DeleteXssDetectRuleRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api_helper.Response'
+      summary: 删除xss攻击防护规则
+      tags:
+      - XssDetect
+    get:
+      description: 查询全部xss攻击防护规则
       produces:
       - application/json
       responses:
@@ -535,69 +507,26 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/api_helper.Response'
-      summary: 分页查询xss攻击匹配规则
+      summary: 查询全部xss攻击防护规则
       tags:
       - XssDetect
     post:
       consumes:
       - application/json
-      description: 新增xss攻击匹配规则
+      description: 新增sql注入防护规则
       parameters:
       - description: 请求体
         in: body
-        name: api_helper.CreateXssDetectRequest
+        name: types.XssDetectRule
         required: true
         schema:
-          $ref: '#/definitions/api_helper.CreateXssDetectRequest'
+          $ref: '#/definitions/types.XssDetectRule'
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/api_helper.Response'
-      summary: 新增xss攻击匹配规则
-      tags:
-      - XssDetect
-  /waf/api/v1/xssDetect/{id}:
-    delete:
-      description: 删除sql注入规则
-      parameters:
-      - description: 主键ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api_helper.Response'
-      summary: 删除sql注入规则
-      tags:
-      - XssDetect
-    patch:
-      description: 编辑xss攻击匹配规则
-      parameters:
-      - description: 主键ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: 请求体
-        in: body
-        name: api_helper.CreateXssDetectRequest
-        required: true
-        schema:
-          $ref: '#/definitions/api_helper.CreateXssDetectRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/api_helper.Response'
-      summary: 编辑xss攻击匹配规则
+      summary: 新增xss攻击防护规则
       tags:
       - XssDetect
 swagger: "2.0"

@@ -3,7 +3,6 @@ package main
 import (
 	"GoWAFer/api"
 	_ "GoWAFer/docs"
-	"GoWAFer/internal/repository"
 	"GoWAFer/migrate"
 	"GoWAFer/pkg/config"
 	"GoWAFer/pkg/database"
@@ -30,7 +29,7 @@ import (
 func main() {
 	graceful.Welcome()
 
-	// 读取配置文件
+	// 读取配置文章
 	conf := config.ReadConfig()
 	log.Println("配置文件加载成功")
 
@@ -42,28 +41,7 @@ func main() {
 	log.Println("数据库连接成功")
 	rdb := database.InitRedis()
 
-	// 创建一个协程用于管理过期的黑白名单IP
-	go func() {
-		repo := repository.NewIPRepository(db)
-		// 创建一个每秒触发一次的定时器
-		ticker := time.NewTicker(1 * time.Second)
-		defer ticker.Stop()
-
-		// 无限循环，等待定时器的信号
-		for {
-			select {
-			case <-ticker.C:
-				// 每当定时器触发，调用DeleteExpired函数
-				err := repo.DeleteExpired()
-				if err != nil {
-					// 处理错误
-					fmt.Println("Error deleting expired records:", err)
-				}
-			}
-		}
-	}()
-
-	// 迁移数据
+	// 迁移数据库
 	migrate.AutoMigrateAndInsertData(db)
 	log.Println("数据库迁移成功")
 

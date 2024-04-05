@@ -1,59 +1,51 @@
 package repository
 
 import (
-	"GoWAFer/internal/model"
-	"fmt"
-	"gorm.io/gorm"
+	"GoWAFer/internal/types"
+	"context"
+	"github.com/go-redis/redis/v8"
+)
+
+const (
+	SqlInjectRules = "sqlInjectRules" // sql防护规则集合
 )
 
 type SqlInjectRepository struct {
-	db *gorm.DB
+	ctx context.Context
+	rdb *redis.Client
 }
 
-func NewSqlInjectRepository(db *gorm.DB) *SqlInjectRepository {
-	return &SqlInjectRepository{db: db}
-}
-
-// Create 新增sql注入规则
-func (r *SqlInjectRepository) Create(l *model.SqlInjectionRules) error {
-	return r.db.Create(l).Error
-}
-
-// FindPaginated 分页查询sql注入规则
-func (r *SqlInjectRepository) FindPaginated(pageIndex, pageSize int, keyword string) ([]model.SqlInjectionRules, int) {
-	var rules []model.SqlInjectionRules
-	var count int64
-	query := r.db.Model(&model.SqlInjectionRules{})
-
-	if keyword != "" {
-		query = query.Where("Rule LIKE ?", fmt.Sprintf("%%%s%%", keyword))
+func NewSqlInjectRepository(rdb *redis.Client) *SqlInjectRepository {
+	return &SqlInjectRepository{
+		ctx: context.Background(),
+		rdb: rdb,
 	}
-
-	query.Count(&count).Limit(pageSize).Offset((pageIndex - 1) * pageSize).Find(&rules)
-
-	return rules, int(count)
 }
 
-func (r *SqlInjectRepository) FindByID(id uint) (*model.SqlInjectionRules, error) {
-	var rule *model.SqlInjectionRules
-	if err := r.db.First(&rule, id).Error; err != nil {
-		return nil, err
+// Add 添加sql注入防护规则到规则集合中
+func (r *SqlInjectRepository) Add(rule string) error {
+	if err := r.rdb.SAdd(r.ctx, SqlInjectRules, rule).Err(); err != nil {
+		return err
 	}
-	return rule, nil
+	return nil
 }
 
-// Update 编辑sql注入规则
-func (r *SqlInjectRepository) Update(l *model.SqlInjectionRules) error {
-	return r.db.Save(l).Error
+// GetAll 查询全部sql注入防护规则
+func (r *SqlInjectRepository) GetAll() ([]types.SqlInjectRule, int) {
+	// 获取集合中所有成员
+	rules, _ := r.rdb.SMembers(r.ctx, SqlInjectRules).Result()
+
+	ruleInfos := make([]types.SqlInjectRule, 0)
+	for _, rule := range rules {
+		ruleInfo := types.SqlInjectRule{
+			Rule: rule,
+		}
+		ruleInfos = append(ruleInfos, ruleInfo)
+	}
+	return ruleInfos, len(rules)
 }
 
 // Delete 删除sql注入规则
-func (r *SqlInjectRepository) Delete(l *model.SqlInjectionRules) error {
-	return r.db.Delete(l).Error
-}
-
-func (r *SqlInjectRepository) FindAll() []model.SqlInjectionRules {
-	var rules []model.SqlInjectionRules
-	r.db.Find(&rules)
-	return rules
+func (r *SqlInjectRepository) Delete(rule string) error {
+	return r.rdb.SRem(r.ctx, SqlInjectRules, rule).Err()
 }

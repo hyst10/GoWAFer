@@ -1,12 +1,13 @@
 package controller
 
 import (
-	"GoWAFer/internal/model"
 	"GoWAFer/internal/service"
-	"GoWAFer/pkg/pagination"
+	"GoWAFer/internal/types"
 	"GoWAFer/pkg/utils/api_helper"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
+	"time"
 )
 
 type XssDetectController struct {
@@ -18,110 +19,81 @@ func NewXssDetectController(xssDetectService *service.XssDetectService) *XssDete
 }
 
 // CreateRule godoc
-// @Summary 新增xss攻击匹配规则
-// @Description 新增xss攻击匹配规则
+// @Summary 新增xss攻击防护规则
+// @Description 新增sql注入防护规则
 // @Tags XssDetect
 // @Accept json
 // @Product json
-// @Param api_helper.CreateXssDetectRequest body api_helper.CreateXssDetectRequest true "请求体"
+// @Param types.XssDetectRule body types.XssDetectRule true "请求体"
 // @Success 200 {object} api_helper.Response
 // @Router /waf/api/v1/xssDetect [post]
 func (c *XssDetectController) CreateRule(g *gin.Context) {
-	var req api_helper.CreateXssDetectRequest
+	var req types.XssDetectRule
 	if err := g.ShouldBindJSON(&req); err != nil {
-		api_helper.ClientErrorHandler(g, 40001)
+		g.Error(types.ErrInvalidBody)
 		return
 	}
 
-	newRule := model.XssDetectRules{Rule: req.Rule}
-
-	err := c.xssDetectService.CreateRule(&newRule)
+	err := c.xssDetectService.AddRule(req.Rule)
 	if err != nil {
-		api_helper.InternalErrorHandler(g, err)
+		g.Error(err)
 		return
 	}
 
 	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "操作成功！"})
+
+	go func() {
+		// 等待足够的时间以确保响应已发送
+		time.Sleep(3 * time.Second)
+		// 退出程序
+		os.Exit(1)
+	}()
 }
 
-// FindPaginatedSqlInject godoc
-// @Summary 分页查询xss攻击匹配规则
-// @Description 分页查询xss攻击匹配规则
+// GetAllRules godoc
+// @Summary 查询全部xss攻击防护规则
+// @Description 查询全部xss攻击防护规则
 // @Tags XssDetect
 // @Produce json
-// @Param keywords query string false "关键词"
-// @Param page query int false "页码"
-// @Param perPage query int false "页面大小"
 // @Success 200 {object} api_helper.Response
 // @Router /waf/api/v1/xssDetect [get]
-func (c *XssDetectController) FindPaginatedSqlInject(g *gin.Context) {
-	// 通过请求实例化分页结构体
-	page := pagination.NewFromRequest(g)
-	keyword := g.Query("keywords")
-	page = c.xssDetectService.FindPaginatedRules(page, keyword)
-	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "success", Data: page})
-}
-
-// UpdateRule godoc
-// @Summary 编辑xss攻击匹配规则
-// @Description 编辑xss攻击匹配规则
-// @Tags XssDetect
-// @Produce json
-// @Param id path int true "主键ID"
-// @Param api_helper.CreateXssDetectRequest body api_helper.CreateXssDetectRequest true "请求体"
-// @Success 200 {object} api_helper.Response
-// @Router /waf/api/v1/xssDetect/{id} [patch]
-func (c *XssDetectController) UpdateRule(g *gin.Context) {
-	var req api_helper.CreateXssDetectRequest
-	if err := g.ShouldBindJSON(&req); err != nil {
-		api_helper.ClientErrorHandler(g, 40001)
-		return
+func (c *XssDetectController) GetAllRules(g *gin.Context) {
+	items, count := c.xssDetectService.GetAllRules()
+	data := map[string]interface{}{
+		"item":  items,
+		"count": count,
 	}
-
-	id, err := api_helper.GetUintParamFromPath(g, "id")
-	if err != nil {
-		api_helper.ClientErrorHandler(g, 40004)
-		return
-	}
-	current, err := c.xssDetectService.FindRuleByID(id)
-	if err != nil {
-		api_helper.ClientErrorHandler(g, 40005)
-		return
-	}
-	current.Rule = req.Rule
-	err = c.xssDetectService.UpdateRule(current)
-	if err != nil {
-		api_helper.InternalErrorHandler(g, err)
-		return
-	}
-
-	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "操作成功！"})
+	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "success", Data: data})
 }
 
 // DeleteRule godoc
-// @Summary 删除sql注入规则
-// @Description 删除sql注入规则
+// @Summary 删除xss攻击防护规则
+// @Description 删除xss攻击防护规则
 // @Tags XssDetect
-// @Produce json
-// @Param id path int true "主键ID"
+// @Accept json
+// @Product json
+// @Param types.DeleteXssDetectRuleRequest body types.DeleteXssDetectRuleRequest true "请求体"
 // @Success 200 {object} api_helper.Response
-// @Router /waf/api/v1/xssDetect/{id} [delete]
+// @Router /waf/api/v1/xssDetect [delete]
 func (c *XssDetectController) DeleteRule(g *gin.Context) {
-	id, err := api_helper.GetUintParamFromPath(g, "id")
-	if err != nil {
-		api_helper.ClientErrorHandler(g, 40004)
+	var req types.DeleteXssDetectRuleRequest
+	if err := g.ShouldBindJSON(&req); err != nil {
+		g.Error(types.ErrInvalidBody)
 		return
 	}
-	current, err := c.xssDetectService.FindRuleByID(id)
+
+	err := c.xssDetectService.DeleteRule(req.Rule)
 	if err != nil {
-		api_helper.ClientErrorHandler(g, 40005)
-		return
-	}
-	err = c.xssDetectService.DeleteRule(current)
-	if err != nil {
-		api_helper.InternalErrorHandler(g, err)
+		g.Error(err)
 		return
 	}
 
 	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "操作成功！"})
+
+	go func() {
+		// 等待足够的时间以确保响应已发送
+		time.Sleep(3 * time.Second)
+		// 退出程序
+		os.Exit(1)
+	}()
 }

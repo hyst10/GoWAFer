@@ -1,7 +1,7 @@
 {
   "type": "page",
   "title": "白名单路由管理",
-  "remark": "路由为白名单时跳过后续sql注入、xss攻击检查，当某路由不涉及关键业务时可以将路由加入到白名单来提升响应速度。",
+  "remark": "路由为白名单时跳过后续sql注入、xss攻击等检查，当路由不存在注入点或不涉及关键业务时建议将路由加入到白名单中来提升响应速度。",
   "toolbar": [
     {
       "type": "button",
@@ -133,6 +133,7 @@
           "name": "method",
           "type": "mapping",
           "map": {
+            "default": "<span class='label' style='background-color: #ff5252; color: white;'>*</span>",
             "*": "<span class='label' style='background-color: #ff5252; color: white;'>*</span>",
             "GET": "<span class='label' style='background-color: #2196f3; color: white;'>GET</span>",
             "POST": "<span class='label' style='background-color: #4caf50; color: white;'>POST</span>",

@@ -1,9 +1,8 @@
 package service
 
 import (
-	"GoWAFer/internal/model"
 	"GoWAFer/internal/repository"
-	"GoWAFer/pkg/pagination"
+	"GoWAFer/internal/types"
 )
 
 type XssDetectService struct {
@@ -14,30 +13,17 @@ func NewXssDetectService(r *repository.XssDetectRepository) *XssDetectService {
 	return &XssDetectService{xssDetectRepository: r}
 }
 
-// CreateRule 创建xss防护规则
-func (c *XssDetectService) CreateRule(r *model.XssDetectRules) error {
-	return c.xssDetectRepository.Create(r)
+// AddRule 新增xss防护规则
+func (c *XssDetectService) AddRule(rule string) error {
+	return c.xssDetectRepository.Add(rule)
 }
 
-// FindPaginatedRules 分页查询xss防护规则
-func (c *XssDetectService) FindPaginatedRules(page *pagination.Pages, keyword string) *pagination.Pages {
-	items, count := c.xssDetectRepository.FindPaginated(page.Page, page.PerPage, keyword)
-	page.Items = items
-	page.Total = count
-	return page
-}
-
-// FindRuleByID 通过主键ID查询防护规则
-func (c *XssDetectService) FindRuleByID(id uint) (*model.XssDetectRules, error) {
-	return c.xssDetectRepository.FindByID(id)
-}
-
-// UpdateRule 更新防护规则
-func (c *XssDetectService) UpdateRule(r *model.XssDetectRules) error {
-	return c.xssDetectRepository.Update(r)
+// GetAllRules 获取全部防护规则
+func (c *XssDetectService) GetAllRules() ([]types.SqlInjectRule, int) {
+	return c.xssDetectRepository.GetAll()
 }
 
 // DeleteRule 删除防护规则
-func (c *XssDetectService) DeleteRule(r *model.XssDetectRules) error {
-	return c.xssDetectRepository.Delete(r)
+func (c *XssDetectService) DeleteRule(rule string) error {
+	return c.xssDetectRepository.Delete(rule)
 }

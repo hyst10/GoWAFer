@@ -133,14 +133,14 @@ var doc = `{
         },
         "/waf/api/v1/ip": {
             "get": {
-                "description": "分页查询IP",
+                "description": "分页查询IP管理记录",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "IP"
                 ],
-                "summary": "分页查询IP",
+                "summary": "分页查询IP管理记录",
                 "parameters": [
                     {
                         "type": "string",
@@ -185,45 +185,16 @@ var doc = `{
                 "tags": [
                     "IP"
                 ],
-                "summary": "新增IP记录",
+                "summary": "新增IP管理记录",
                 "parameters": [
                     {
                         "description": "请求体",
-                        "name": "api_helper.CreateIPRequest",
+                        "name": "types.AddIPRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_helper.CreateIPRequest"
+                            "$ref": "#/definitions/types.AddIPRequest"
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api_helper.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/waf/api/v1/ip/{id}": {
-            "delete": {
-                "description": "删除IP",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "IP"
-                ],
-                "summary": "删除IP",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "IP主键ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -235,30 +206,23 @@ var doc = `{
                     }
                 }
             },
-            "patch": {
-                "description": "编辑IP",
-                "produces": [
+            "delete": {
+                "description": "删除IP记录",
+                "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "IP"
                 ],
-                "summary": "编辑IP",
+                "summary": "删除IP记录",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "IP主键ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "请求体",
-                        "name": "api_helper.UpdateIPRequest",
+                        "name": "types.DeleteIPRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_helper.UpdateIPRequest"
+                            "$ref": "#/definitions/types.DeleteIPRequest"
                         }
                     }
                 ],
@@ -427,11 +391,11 @@ var doc = `{
                 "parameters": [
                     {
                         "description": "请求体",
-                        "name": "types.AddRoutingRequest",
+                        "name": "types.DeleteRoutingRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/types.AddRoutingRequest"
+                            "$ref": "#/definitions/types.DeleteRoutingRequest"
                         }
                     }
                 ],
@@ -447,34 +411,14 @@ var doc = `{
         },
         "/waf/api/v1/sqlInject": {
             "get": {
-                "description": "分页查询SQL注入规则",
+                "description": "查询全部sql注入防护规则",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "SQlInject"
+                    "SqlInject"
                 ],
-                "summary": "分页查询SQL注入规则",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "关键词",
-                        "name": "keywords",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "页码",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "页面大小",
-                        "name": "perPage",
-                        "in": "query"
-                    }
-                ],
+                "summary": "查询全部sql注入防护规则",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -485,52 +429,23 @@ var doc = `{
                 }
             },
             "post": {
-                "description": "新增sql注入规则",
+                "description": "新增sql注入防护规则",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "SQlInject"
+                    "SqlInject"
                 ],
-                "summary": "新增sql注入规则",
+                "summary": "新增sql注入防护规则",
                 "parameters": [
                     {
                         "description": "请求体",
-                        "name": "api_helper.CreateSqlInjectRequest",
+                        "name": "types.AddSqlInjectRuleRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_helper.CreateSqlInjectRequest"
+                            "$ref": "#/definitions/types.AddSqlInjectRuleRequest"
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api_helper.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/waf/api/v1/sqlInject/{id}": {
-            "delete": {
-                "description": "删除sql注入规则",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "SQlInject"
-                ],
-                "summary": "删除sql注入规则",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "主键ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -542,30 +457,23 @@ var doc = `{
                     }
                 }
             },
-            "patch": {
-                "description": "编辑sql注入规则",
-                "produces": [
+            "delete": {
+                "description": "删除sql注入防护规则",
+                "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "SQlInject"
+                    "SqlInject"
                 ],
-                "summary": "编辑sql注入规则",
+                "summary": "删除sql注入防护规则",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "主键ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "请求体",
-                        "name": "api_helper.CreateSqlInjectRequest",
+                        "name": "types.DeleteSqlInjectRuleRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_helper.CreateSqlInjectRequest"
+                            "$ref": "#/definitions/types.DeleteSqlInjectRuleRequest"
                         }
                     }
                 ],
@@ -581,34 +489,14 @@ var doc = `{
         },
         "/waf/api/v1/xssDetect": {
             "get": {
-                "description": "分页查询xss攻击匹配规则",
+                "description": "查询全部xss攻击防护规则",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "XssDetect"
                 ],
-                "summary": "分页查询xss攻击匹配规则",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "关键词",
-                        "name": "keywords",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "页码",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "页面大小",
-                        "name": "perPage",
-                        "in": "query"
-                    }
-                ],
+                "summary": "查询全部xss攻击防护规则",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -619,52 +507,23 @@ var doc = `{
                 }
             },
             "post": {
-                "description": "新增xss攻击匹配规则",
+                "description": "新增sql注入防护规则",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "XssDetect"
                 ],
-                "summary": "新增xss攻击匹配规则",
+                "summary": "新增xss攻击防护规则",
                 "parameters": [
                     {
                         "description": "请求体",
-                        "name": "api_helper.CreateXssDetectRequest",
+                        "name": "types.XssDetectRule",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_helper.CreateXssDetectRequest"
+                            "$ref": "#/definitions/types.XssDetectRule"
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/api_helper.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/waf/api/v1/xssDetect/{id}": {
-            "delete": {
-                "description": "删除sql注入规则",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "XssDetect"
-                ],
-                "summary": "删除sql注入规则",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "主键ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -676,30 +535,23 @@ var doc = `{
                     }
                 }
             },
-            "patch": {
-                "description": "编辑xss攻击匹配规则",
-                "produces": [
+            "delete": {
+                "description": "删除xss攻击防护规则",
+                "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "XssDetect"
                 ],
-                "summary": "编辑xss攻击匹配规则",
+                "summary": "删除xss攻击防护规则",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "主键ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "请求体",
-                        "name": "api_helper.CreateXssDetectRequest",
+                        "name": "types.DeleteXssDetectRuleRequest",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api_helper.CreateXssDetectRequest"
+                            "$ref": "#/definitions/types.DeleteXssDetectRuleRequest"
                         }
                     }
                 ],
@@ -715,45 +567,6 @@ var doc = `{
         }
     },
     "definitions": {
-        "api_helper.CreateIPRequest": {
-            "type": "object",
-            "required": [
-                "ip-address"
-            ],
-            "properties": {
-                "expirationAt": {
-                    "type": "string"
-                },
-                "ip-address": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "integer"
-                }
-            }
-        },
-        "api_helper.CreateSqlInjectRequest": {
-            "type": "object",
-            "required": [
-                "rule"
-            ],
-            "properties": {
-                "rule": {
-                    "type": "string"
-                }
-            }
-        },
-        "api_helper.CreateXssDetectRequest": {
-            "type": "object",
-            "required": [
-                "rule"
-            ],
-            "properties": {
-                "rule": {
-                    "type": "string"
-                }
-            }
-        },
         "api_helper.LoginRequest": {
             "type": "object",
             "required": [
@@ -788,20 +601,6 @@ var doc = `{
                 },
                 "status": {
                     "type": "integer"
-                }
-            }
-        },
-        "api_helper.UpdateIPRequest": {
-            "type": "object",
-            "required": [
-                "ip_address"
-            ],
-            "properties": {
-                "expiration_at": {
-                    "type": "string"
-                },
-                "ip_address": {
-                    "type": "string"
                 }
             }
         },
@@ -907,22 +706,115 @@ var doc = `{
                 }
             }
         },
+        "types.AddIPRequest": {
+            "type": "object",
+            "required": [
+                "ip",
+                "type"
+            ],
+            "properties": {
+                "expiration": {
+                    "type": "integer"
+                },
+                "ip": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
         "types.AddRoutingRequest": {
             "type": "object",
             "required": [
                 "method",
-                "route",
+                "routing",
                 "type"
             ],
             "properties": {
                 "method": {
                     "type": "string"
                 },
-                "route": {
+                "routing": {
                     "type": "string"
                 },
                 "type": {
                     "type": "integer"
+                }
+            }
+        },
+        "types.AddSqlInjectRuleRequest": {
+            "type": "object",
+            "required": [
+                "rule"
+            ],
+            "properties": {
+                "rule": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteIPRequest": {
+            "type": "object",
+            "required": [
+                "ip",
+                "type"
+            ],
+            "properties": {
+                "ip": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.DeleteRoutingRequest": {
+            "type": "object",
+            "required": [
+                "method",
+                "routing",
+                "type"
+            ],
+            "properties": {
+                "method": {
+                    "type": "string"
+                },
+                "routing": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "types.DeleteSqlInjectRuleRequest": {
+            "type": "object",
+            "required": [
+                "rule"
+            ],
+            "properties": {
+                "rule": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.DeleteXssDetectRuleRequest": {
+            "type": "object",
+            "required": [
+                "rule"
+            ],
+            "properties": {
+                "rule": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.XssDetectRule": {
+            "type": "object",
+            "properties": {
+                "rule": {
+                    "type": "string"
                 }
             }
         }

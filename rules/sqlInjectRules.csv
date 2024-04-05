@@ -1,0 +1,11 @@
+﻿rule
+(?i)(union)(.*)(select)
+(?i)select(.*)from
+(?i)insert into
+(?i)delete from
+(?i)drop table
+(?i)update(.*)set
+--
+(\b|\')(OR|or|oR|Or)('|\b)\s*('\d+'|'\d+'--\s*|'\d+'(\s+)(--)?|\d+)(\s+)(=|like)(\s+)(\b|\')\d+('|\b)
+/\*.*\*/
+;

@@ -25,6 +25,8 @@ func ErrorHandlingMiddleware() gin.HandlerFunc {
 				errCode = 40001
 			case errors.Is(err, types.ErrRoutingNotMatch):
 				errCode = 40002
+			case errors.Is(err, types.ErrIPNotMatch):
+				errCode = 40005
 			default:
 				log.Printf("服务器异常错误：%v\n", err)
 				httpStatusCode = 500

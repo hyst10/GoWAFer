@@ -9,7 +9,7 @@
       "icon": "fa fa-plus pull-left",
       "primary": true,
       "dialog": {
-        "title": "新增防护规则",
+        "title": "新增规则",
         "body": {
           "type": "form",
           "mode": "horizontal",
@@ -18,7 +18,7 @@
             {
               "type": "input-text",
               "name": "rule",
-              "label": "规则",
+              "label": "防护规则",
               "required": true
             }
           ]
@@ -29,63 +29,23 @@
   "body": [
     {
       "type": "crud",
-      "api": "/waf/api/v1/sqlInject?page=${page}&perPage=${perPage}&keywords=${keywords}",
+      "api": "/waf/api/v1/sqlInject",
       "defaultParams": {
         "perPage": 10
       },
       "headerToolbar": [
-        "statistics",
-        "switch-per-page",
-        "export-excel",
         {
-          "type": "pagination",
-          "align": "right"
+          "type": "export-csv",
+          "label": "导出规则",
+          "filename": "sqlInjectRules"
         }
       ],
-      "footerToolbar": [
-        "statistics",
-        "switch-per-page",
-        "pagination"
-      ],
       "syncLocation": false,
-      "filter": {
-        "title": "条件搜索",
-        "body": [
-          {
-            "type": "group",
-            "body": [
-              {
-                "type": "input-text",
-                "name": "keywords",
-                "label": "关键词",
-                "clearable": true,
-                "placeholder": "通过关键词搜索",
-                "size": "sm"
-              }
-            ]
-          }
-        ],
-        "actions": [
-          {
-            "type": "reset",
-            "label": "重置"
-          },
-          {
-            "type": "submit",
-            "level": "primary",
-            "label": "查询"
-          }
-        ]
-      },
       "columns": [
         {
-          "label": "ID",
-          "name": "id"
-        },
-        {
-          "label": "匹配规则",
+          "label": "防护规则",
           "name": "rule",
-          "remark": "正则表达式",
+          "remark": "正则匹配模式",
           "type": "tpl",
           "tpl": "<div style='background-color: #f2f4f8; padding: 5px; border-radius: 4px; text-align: center;'>${rule}</div>"
         },
@@ -96,32 +56,18 @@
           "buttons": [
             {
               "type": "button",
-              "icon": "fa fa-pencil",
-              "tooltip": "编辑",
-              "actionType": "dialog",
-              "dialog": {
-                "title": "编辑",
-                "body": {
-                  "type": "form",
-                  "api": "patch:/waf/api/v1/sqlInject/$id",
-                  "body": [
-                    {
-                      "type": "input-text",
-                      "name": "rule",
-                      "label": "匹配规则",
-                      "required": true
-                    }
-                  ]
-                }
-              }
-            },
-            {
-              "type": "button",
-              "icon": "fa fa-times text-danger",
+              "label": "删除",
+              "level": "danger",
               "actionType": "ajax",
               "tooltip": "删除",
               "confirmText": "确认要删除?",
-              "api": "delete:/waf/api/v1/sqlInject/$id"
+              "api": {
+                "method": "delete",
+                "url": "/waf/api/v1/sqlInject",
+                "data": {
+                  "rule": "${rule}"
+                }
+              }
             }
           ]
         }
