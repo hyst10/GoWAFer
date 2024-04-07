@@ -1,6 +1,6 @@
 {
   "type": "page",
-  "title": "SQL注入防护规则",
+  "title": "sql注入防御",
   "toolbar": [
     {
       "type": "button",
@@ -30,22 +30,30 @@
     {
       "type": "crud",
       "api": "/waf/api/v1/sqlInject",
-      "defaultParams": {
-        "perPage": 10
-      },
       "headerToolbar": [
+        "statistics",
+        "switch-per-page",
         {
           "type": "export-csv",
           "label": "导出规则",
           "filename": "sqlInjectRules"
+        },
+        {
+          "type": "pagination",
+          "align": "right"
         }
       ],
+      "footerToolbar": [
+        "statistics",
+        "switch-per-page",
+        "pagination"
+      ],
       "syncLocation": false,
+      "loadDataOnce": true,
       "columns": [
         {
           "label": "防护规则",
           "name": "rule",
-          "remark": "正则匹配模式",
           "type": "tpl",
           "tpl": "<div style='background-color: #f2f4f8; padding: 5px; border-radius: 4px; text-align: center;'>${rule}</div>"
         },
@@ -57,8 +65,9 @@
             {
               "type": "button",
               "label": "删除",
-              "level": "danger",
+              "level": "link",
               "actionType": "ajax",
+              "className": "text-danger",
               "tooltip": "删除",
               "confirmText": "确认要删除?",
               "api": {

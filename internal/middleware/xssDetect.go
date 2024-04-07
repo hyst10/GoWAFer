@@ -25,7 +25,7 @@ func XSSDetectMiddleware() gin.HandlerFunc {
 		query := c.Request.URL.Query()
 		for _, values := range query {
 			for _, value := range values {
-				for _, pattern := range types.XssDetectRules {
+				for pattern := range types.XssDetectRules {
 					if pattern.MatchString(value) {
 						c.Set("BlockedBy", "xss攻击防护中间件")
 						c.Set("BlockReason", "查询参数中检测到xss攻击")
@@ -43,7 +43,7 @@ func XSSDetectMiddleware() gin.HandlerFunc {
 			if err := c.Request.ParseForm(); err == nil {
 				for _, values := range c.Request.PostForm {
 					for _, value := range values {
-						for _, pattern := range types.XssDetectRules {
+						for pattern := range types.XssDetectRules {
 							if pattern.MatchString(value) {
 								c.Set("BlockedBy", "xss攻击防护中间件")
 								c.Set("BlockReason", "表单数据中检测到xss攻击")

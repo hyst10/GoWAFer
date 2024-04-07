@@ -28,7 +28,7 @@ func SqlInjectMiddleware() gin.HandlerFunc {
 		query := c.Request.URL.Query()
 		for _, values := range query {
 			for _, value := range values {
-				for _, pattern := range types.SqlInjectRules {
+				for pattern := range types.SqlInjectRules {
 					if pattern.MatchString(value) {
 						c.Set("BlockedBy", "sql注入防护中间件")
 						c.Set("BlockReason", "查询参数中检测到sql注入")
@@ -42,7 +42,7 @@ func SqlInjectMiddleware() gin.HandlerFunc {
 
 		// c.GetRawData()会读取并消耗掉http.Request的Body，这意味着Body流被读取后，如果不进行特殊处理，就无法再次读取。这在后续的处理中可能会导致问题
 		body, _ := c.GetRawData()
-		for _, pattern := range types.SqlInjectRules {
+		for pattern := range types.SqlInjectRules {
 			if pattern.MatchString(string(body)) {
 				c.Set("BlockedBy", "sql注入防护中间件")
 				c.Set("BlockReason", "请求体body中检测到sql注入")

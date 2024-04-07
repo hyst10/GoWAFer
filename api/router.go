@@ -6,8 +6,8 @@ import (
 	"GoWAFer/internal/repository"
 	"GoWAFer/internal/service"
 	"GoWAFer/internal/types"
-	"GoWAFer/pkg/cache"
 	"GoWAFer/pkg/config"
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
@@ -67,26 +67,45 @@ func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, rdb *redis.Client, conf *co
 	r.Use(middleware.CsrfTokenMiddleware())
 	log.Println("CSRFToken中间件加载成功")
 	// 加载sql注入防护规则
-	err := cache.ImportRulesFromCSV(rdb, "./rules/sqlInjectRules.csv", repository.SqlInjectRules)
-	if err != nil {
-		panic(err)
-	}
 	sqlInjectRules, _ := dbs.sqlInjectRepository.GetAll()
-	for _, rule := range sqlInjectRules {
-		compile := regexp.MustCompile(rule.Rule)
-		types.SqlInjectRules = append(types.SqlInjectRules, compile)
+	if len(sqlInjectRules) == 0 {
+		// 导入规则
+		ctx := context.Background()
+		for rule := range types.SqlInjectRules {
+			rdb.SAdd(ctx, repository.SqlInjectRules, rule.String())
+		}
+	} else {
+		// 使用redis中的规则
+		types.SqlInjectRules = make(map[*regexp.Regexp]bool)
+		ctx := context.Background()
+		for _, rule := range sqlInjectRules {
+			compile := regexp.MustCompile(rule.Rule)
+			types.SqlInjectRules[compile] = true
+			rdb.SAdd(ctx, repository.SqlInjectRules, rule)
+		}
 	}
 	log.Println("sql注入防护规则加载成功")
 	// 添加sql注入检测中间件
 	r.Use(middleware.SqlInjectMiddleware())
 	log.Println("sql注入防护中间件加载成功")
 	// 加载xss攻击防护规则
-	//xssDetectRules := dbs.xssDetectRepository.FindAll()
-	//var xssDetect []*regexp.Regexp
-	//for _, rule := range xssDetectRules {
-	//	compile := regexp.MustCompile(rule.Rule)
-	//	xssDetect = append(xssDetect, compile)
-	//}
+	xssDetectRules, _ := dbs.xssDetectRepository.GetAll()
+	if len(xssDetectRules) == 0 {
+		// 导入规则
+		ctx := context.Background()
+		for rule := range types.XssDetectRules {
+			rdb.SAdd(ctx, repository.XssDetectRules, rule.String())
+		}
+	} else {
+		// 使用redis中的规则
+		types.XssDetectRules = make(map[*regexp.Regexp]bool)
+		ctx := context.Background()
+		for _, rule := range xssDetectRules {
+			compile := regexp.MustCompile(rule.Rule)
+			types.XssDetectRules[compile] = true
+			rdb.SAdd(ctx, repository.XssDetectRules, rule)
+		}
+	}
 	log.Println("xss攻击防护规则加载成功")
 	// 添加xss攻击检测中间件
 	r.Use(middleware.XSSDetectMiddleware())

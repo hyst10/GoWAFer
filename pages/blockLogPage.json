@@ -71,7 +71,9 @@
         {
           "label": "Url",
           "name": "url",
-          "width": 50
+          "width": 80,
+          "type": "tpl",
+          "tpl": "${url.length > 50 ? TRUNCATE(url,50) : url}"
         },
         {
           "name": "method",

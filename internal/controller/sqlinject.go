@@ -6,8 +6,7 @@ import (
 	"GoWAFer/pkg/utils/api_helper"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"os"
-	"time"
+	"regexp"
 )
 
 type SqlInjectController struct {
@@ -43,10 +42,7 @@ func (c *SqlInjectController) CreateRule(g *gin.Context) {
 	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "操作成功！"})
 
 	go func() {
-		// 等待足够的时间以确保响应已发送
-		time.Sleep(3 * time.Second)
-		// 退出程序
-		os.Exit(1)
+		types.SqlInjectRules[regexp.MustCompile(req.Rule)] = true
 	}()
 }
 
@@ -91,9 +87,6 @@ func (c *SqlInjectController) DeleteRule(g *gin.Context) {
 	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "操作成功！"})
 
 	go func() {
-		// 等待足够的时间以确保响应已发送
-		time.Sleep(3 * time.Second)
-		// 退出程序
-		os.Exit(1)
+		delete(types.SqlInjectRules, regexp.MustCompile(req.Rule))
 	}()
 }

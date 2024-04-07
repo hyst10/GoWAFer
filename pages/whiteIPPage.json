@@ -100,8 +100,9 @@
             {
               "type": "button",
               "label": "删除",
-              "level": "danger",
+              "level": "link",
               "actionType": "ajax",
+              "className": "text-danger",
               "tooltip": "删除",
               "confirmText": "确认要删除?",
               "api": {
