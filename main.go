@@ -76,7 +76,7 @@ func main() {
 	signal.Notify(stopChan, syscall.SIGINT, syscall.SIGTERM)
 
 	// 启动waf服务
-	srv := &http.Server{Addr: ":8081", Handler: r}
+	srv := &http.Server{Addr: ":8080", Handler: r}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			fmt.Printf("listen: %s\n", err)

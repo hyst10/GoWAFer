@@ -121,7 +121,7 @@ func (c *AdminController) DoLogin(g *gin.Context) {
 // @Success 200 {object} api_helper.Response
 // @Router /waf/api/v1/auth/getCaptcha [get]
 func (c *AdminController) GetCaptcha(g *gin.Context) {
-	captchaID, captchaBs6, err := captcha_handler.GenerateCaptcha()
+	captchaID, captchaBs6, _, err := captcha_handler.GenerateCaptcha()
 	if err != nil {
 		api_helper.InternalErrorHandler(g, err)
 		return
