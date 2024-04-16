@@ -19,4 +19,4 @@ secret:
     jwtsecretkey: 123456adad
     sessionsecretkey: snadkadmsa
 server:
-    targetaddress: http://127.0.0.1:5353
+    targetaddress: http://host.docker.internal:5353
