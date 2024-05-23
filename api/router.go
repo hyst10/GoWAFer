@@ -1,17 +1,17 @@
 package api
 
 import (
+	"GoWAFer/constants"
 	"GoWAFer/internal/controller"
 	"GoWAFer/internal/middleware"
 	"GoWAFer/internal/repository"
 	"GoWAFer/internal/service"
-	"GoWAFer/internal/types"
 	"GoWAFer/pkg/config"
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
-	"log"
 	"net/http/httputil"
 	"net/url"
 	"regexp"
@@ -44,72 +44,76 @@ func RegisterAllHandlers(r *gin.Engine, db *gorm.DB, rdb *redis.Client, conf *co
 	apiGroup.Use(middleware.ErrorHandlingMiddleware()) // 错误处理中间件
 
 	RegisterUserHandler(apiGroup, dbs, conf)
-	RegisterIPHandler(apiGroup, dbs, conf)
-	RegisterRoutingManageHandler(apiGroup, dbs, conf)
-	RegisterLogHandler(apiGroup, dbs, conf)
+	RegisterIPHandlers(apiGroup, dbs, conf)
+	RegisterRoutingManageHandlers(apiGroup, dbs, conf)
+	RegisterLogHandlers(apiGroup, dbs, conf)
 	RegisterConfigHandler(apiGroup, dbs, conf)
 	RegisterSqlInjectHandler(apiGroup, dbs, conf)
 	RegisterXssDetectHandler(apiGroup, dbs, conf)
 
 	// 添加日志中间件
 	r.Use(middleware.TrafficLogger(dbs.logRepository))
-	log.Println("日志中间件加载成功")
+	fmt.Println("日志中间件加载成功")
+
 	// 添加IP管理中间件
 	r.Use(middleware.IPManager(dbs.ipManageRepository))
-	log.Println("IP管理中间件加载成功")
+	fmt.Println("IP管理中间件加载成功")
+
 	// 添加路由守卫中间件
-	r.Use(middleware.RouteGuardMiddleware(dbs.routingManageRepository))
-	log.Println("路由守卫中间件加载成功")
+	r.Use(middleware.PathManager(dbs.routingManageRepository))
+	fmt.Println("路径管理中间件加载成功")
+
 	// 添加限速器中间件
 	r.Use(middleware.RateLimitMiddleware(conf, dbs.ipManageRepository))
-	log.Println("CC攻击防护中间件加载成功")
+	fmt.Println("CC攻击防护中间件加载成功")
+
 	// 添加CSRFToken中间件
-	r.Use(middleware.CsrfTokenMiddleware())
-	log.Println("CSRFToken中间件加载成功")
+	//r.Use(middleware.CsrfTokenMiddleware())
+	//fmt.Println("CSRFToken中间件加载成功")
+
 	// 加载sql注入防护规则
 	sqlInjectRules, _ := dbs.sqlInjectRepository.GetAll()
 	if len(sqlInjectRules) == 0 {
 		// 导入规则
 		ctx := context.Background()
-		for rule := range types.SqlInjectRules {
-			rdb.SAdd(ctx, repository.SqlInjectRules, rule.String())
+		for rule := range constants.SqlInjectRules {
+			rdb.SAdd(ctx, constants.SqlInjectKey, rule.String())
 		}
 	} else {
 		// 使用redis中的规则
-		types.SqlInjectRules = make(map[*regexp.Regexp]bool)
+		constants.SqlInjectRules = make(map[*regexp.Regexp]bool)
 		ctx := context.Background()
 		for _, rule := range sqlInjectRules {
 			compile := regexp.MustCompile(rule.Rule)
-			types.SqlInjectRules[compile] = true
-			rdb.SAdd(ctx, repository.SqlInjectRules, rule)
+			constants.SqlInjectRules[compile] = true
+			rdb.SAdd(ctx, constants.SqlInjectKey, rule)
 		}
 	}
-	log.Println("sql注入防护规则加载成功")
-	// 添加sql注入检测中间件
-	r.Use(middleware.SqlInjectMiddleware())
-	log.Println("sql注入防护中间件加载成功")
+	fmt.Println("sql注入防护规则加载成功")
+
 	// 加载xss攻击防护规则
 	xssDetectRules, _ := dbs.xssDetectRepository.GetAll()
 	if len(xssDetectRules) == 0 {
 		// 导入规则
 		ctx := context.Background()
-		for rule := range types.XssDetectRules {
-			rdb.SAdd(ctx, repository.XssDetectRules, rule.String())
+		for rule := range constants.XssDetectRules {
+			rdb.SAdd(ctx, constants.XssDetectKey, rule.String())
 		}
 	} else {
 		// 使用redis中的规则
-		types.XssDetectRules = make(map[*regexp.Regexp]bool)
+		constants.XssDetectRules = make(map[*regexp.Regexp]bool)
 		ctx := context.Background()
 		for _, rule := range xssDetectRules {
 			compile := regexp.MustCompile(rule.Rule)
-			types.XssDetectRules[compile] = true
-			rdb.SAdd(ctx, repository.XssDetectRules, rule)
+			constants.XssDetectRules[compile] = true
+			rdb.SAdd(ctx, constants.XssDetectKey, rule)
 		}
 	}
-	log.Println("xss攻击防护规则加载成功")
-	// 添加xss攻击检测中间件
-	r.Use(middleware.XSSDetectMiddleware())
-	log.Println("xss攻击防护中间件加载成功")
+	fmt.Println("xss攻击防护规则加载成功")
+
+	// 添加安全检测中间件
+	r.Use(middleware.SecureRequestMiddleware())
+	fmt.Println("安全检测中间件加载成功")
 
 	// 设置反向代理
 	target, _ := url.Parse(conf.Server.TargetAddress)
@@ -127,8 +131,8 @@ func RegisterUserHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config
 	authGroup.GET("/getCaptcha", userController.GetCaptcha)
 }
 
-// RegisterIPHandler 注册IP管理方法
-func RegisterIPHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
+// RegisterIPHandlers 注册IP管理方法
+func RegisterIPHandlers(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
 	ipManageService := service.NewIPManageService(dbs.ipManageRepository)
 	ipManageController := controller.NewIPManageController(ipManageService)
 	ipManageGroup := r.Group("/ip")
@@ -138,8 +142,8 @@ func RegisterIPHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) 
 	ipManageGroup.DELETE("", ipManageController.DeleteIP)
 }
 
-// RegisterRoutingManageHandler 注册路由管理方法
-func RegisterRoutingManageHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
+// RegisterRoutingManageHandlers 注册路由管理方法
+func RegisterRoutingManageHandlers(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
 	routingManageService := service.NewRoutingManageService(dbs.routingManageRepository)
 	routingManageController := controller.NewRoutingManageController(routingManageService)
 	routingGroup := r.Group("/routing")
@@ -149,7 +153,8 @@ func RegisterRoutingManageHandler(r *gin.RouterGroup, dbs *Databases, conf *conf
 	routingGroup.DELETE("", routingManageController.DeleteRouting)
 }
 
-func RegisterLogHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
+// RegisterLogHandlers 注册日志路由
+func RegisterLogHandlers(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
 	logService := service.NewLogService(dbs.logRepository)
 	logController := controller.NewLogController(logService)
 	logGroup := r.Group("/log")
@@ -158,6 +163,7 @@ func RegisterLogHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config)
 	logGroup.GET("/getBlockLog", logController.FindPaginatedBlockedLog)
 }
 
+// RegisterConfigHandler 注册配置方法
 func RegisterConfigHandler(r *gin.RouterGroup, dbs *Databases, conf *config.Config) {
 	configController := controller.NewConfigController(conf)
 	configGroup := r.Group("/config")

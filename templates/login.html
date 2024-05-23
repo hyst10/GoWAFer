@@ -47,7 +47,7 @@
                     "type": "form",
                     "initApi": "get:/waf/api/v1/auth/getCaptcha",
                     "redirect": "/waf",
-                    "id":"form-test",
+                    "id": "loginForm",
                     "title": "GoWAFer后台登录",
                     "api": {
                         "url": "/waf/api/v1/auth/dologin",
@@ -72,14 +72,16 @@
                                 {
                                     "type": "input-text",
                                     "name": "captcha",
-                                    "label": "图像验证码",
+                                    "label": "验证码",
                                     "required": true,
                                 },
                                 {
-                                    "name":"aaa",
                                     "type": "image",
                                     "src": "${bs6}",
-                                    "height": "40px",
+                                    "height": "23px",
+                                    "style": {
+                                        "marginTop": "24px"
+                                    }
                                 },
                                 {
                                     "type": "button",
@@ -91,6 +93,9 @@
                                     },
                                     "level": "link",
                                     "icon": "fa fa-refresh",
+                                    "style": {
+                                        "marginTop": "24px"
+                                    }
                                 }
                             ]
                         },
@@ -99,33 +104,46 @@
                             "name": "captchaId",
                             "value": "${id}",
                         },
+                        {
+                            "type": "submit",
+                            "label": "登录",
+                            "primary": true,
+                            "style": {
+                                "width": "100%"
+                            }
+                        },
+                        {
+                            "type": "html",
+                            "html": "<p>© 2024 supercat0867. 版权所有。| <a href=\"https://beian.miit.gov.cn/\" target=\"_blank\">蜀备XXXXXXX</a></p>",
+                            "style": {
+                                "fontSize": "14px",
+                                "color": "#666",
+                                "textAlign": "center",
+                            }
+                        }
                     ],
                     "onEvent": {
                         "submitFail": {
                             "actions": [
                                 {
-                                    "componentId": "form-test",
+                                    "componentId": "loginForm",
                                     "actionType": "reload",
                                 },
                             ]
                         }
                     },
-                    "actions": [
-                        {
-                            "type": "submit",
-                            "label": "登录",
-                            "primary": true
-                        }
-                    ],
                     "style": {
-                        "width": "400px",
+                        "width": "450px",
                         "padding": "20px",
                         "boxShadow": "0 4px 8px rgba(0, 0, 0, 0.1)",
-                        "borderRadius": "8px",
+                        "borderRadius": "12px",
                         "background": "#fff",
                         "textAlign": "left"
                     }
                 }
+            },
+            "style": {
+                "background": "#e7f0fd"
             }
         }
 

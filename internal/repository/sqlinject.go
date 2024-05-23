@@ -1,13 +1,10 @@
 package repository
 
 import (
+	"GoWAFer/constants"
 	"GoWAFer/internal/types"
 	"context"
 	"github.com/go-redis/redis/v8"
-)
-
-const (
-	SqlInjectRules = "sqlInjectRules" // sql防护规则集合
 )
 
 type SqlInjectRepository struct {
@@ -24,7 +21,7 @@ func NewSqlInjectRepository(rdb *redis.Client) *SqlInjectRepository {
 
 // Add 添加sql注入防护规则到规则集合中
 func (r *SqlInjectRepository) Add(rule string) error {
-	if err := r.rdb.SAdd(r.ctx, SqlInjectRules, rule).Err(); err != nil {
+	if err := r.rdb.SAdd(r.ctx, constants.SqlInjectKey, rule).Err(); err != nil {
 		return err
 	}
 	return nil
@@ -33,7 +30,7 @@ func (r *SqlInjectRepository) Add(rule string) error {
 // GetAll 查询全部sql注入防护规则
 func (r *SqlInjectRepository) GetAll() ([]types.SqlInjectRule, int) {
 	// 获取集合中所有成员
-	rules, _ := r.rdb.SMembers(r.ctx, SqlInjectRules).Result()
+	rules, _ := r.rdb.SMembers(r.ctx, constants.SqlInjectKey).Result()
 
 	ruleInfos := make([]types.SqlInjectRule, 0)
 	for _, rule := range rules {
@@ -47,5 +44,5 @@ func (r *SqlInjectRepository) GetAll() ([]types.SqlInjectRule, int) {
 
 // Delete 删除sql注入规则
 func (r *SqlInjectRepository) Delete(rule string) error {
-	return r.rdb.SRem(r.ctx, SqlInjectRules, rule).Err()
+	return r.rdb.SRem(r.ctx, constants.SqlInjectKey, rule).Err()
 }

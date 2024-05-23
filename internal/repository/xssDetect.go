@@ -1,13 +1,10 @@
 package repository
 
 import (
+	"GoWAFer/constants"
 	"GoWAFer/internal/types"
 	"context"
 	"github.com/go-redis/redis/v8"
-)
-
-const (
-	XssDetectRules = "xssDetectRules" // sql防护规则集合
 )
 
 type XssDetectRepository struct {
@@ -23,7 +20,7 @@ func NewXssDetectRepository(rdb *redis.Client) *XssDetectRepository {
 
 // Add 新增xss攻击防护规则
 func (r *XssDetectRepository) Add(rule string) error {
-	if err := r.rdb.SAdd(r.ctx, XssDetectRules, rule).Err(); err != nil {
+	if err := r.rdb.SAdd(r.ctx, constants.XssDetectKey, rule).Err(); err != nil {
 		return err
 	}
 	return nil
@@ -32,7 +29,7 @@ func (r *XssDetectRepository) Add(rule string) error {
 // GetAll 查询全部xss攻击防护规则
 func (r *XssDetectRepository) GetAll() ([]types.SqlInjectRule, int) {
 	// 获取集合中所有成员
-	rules, _ := r.rdb.SMembers(r.ctx, XssDetectRules).Result()
+	rules, _ := r.rdb.SMembers(r.ctx, constants.XssDetectKey).Result()
 
 	ruleInfos := make([]types.SqlInjectRule, 0)
 	for _, rule := range rules {
@@ -46,5 +43,5 @@ func (r *XssDetectRepository) GetAll() ([]types.SqlInjectRule, int) {
 
 // Delete 删除xss攻击防护规则
 func (r *XssDetectRepository) Delete(rule string) error {
-	return r.rdb.SRem(r.ctx, XssDetectRules, rule).Err()
+	return r.rdb.SRem(r.ctx, constants.XssDetectKey, rule).Err()
 }

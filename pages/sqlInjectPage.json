@@ -1,6 +1,6 @@
 {
   "type": "page",
-  "title": "sql注入防御",
+  "title": "sql注入防护规则",
   "toolbar": [
     {
       "type": "button",

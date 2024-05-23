@@ -8,7 +8,6 @@ import (
 	"GoWAFer/pkg/utils/api_helper"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strconv"
 )
 
 type IPManageController struct {
@@ -42,7 +41,7 @@ func (c *IPManageController) AddIP(g *gin.Context) {
 	}
 
 	// 新增IP记录
-	err := c.ipManageService.AddIP(req.IP, req.Expiration, req.Type)
+	err := c.ipManageService.AddIP(req.IP, req.Expiration, req.IsBlack)
 	if err != nil {
 		g.Error(err)
 		return
@@ -56,8 +55,8 @@ func (c *IPManageController) AddIP(g *gin.Context) {
 // @Description 分页查询IP管理记录
 // @Tags IP
 // @Produce json
-// @Param keywords query string false "关键词"
-// @Param type query string true "IP类型"
+// @Param query query string false "查询关键字"
+// @Param isBlack query string false "是否为黑名单"
 // @Param page query int false "页码"
 // @Param perPage query int false "页面大小"
 // @Success 200 {object} api_helper.Response
@@ -65,9 +64,15 @@ func (c *IPManageController) AddIP(g *gin.Context) {
 func (c *IPManageController) FindPaginatedIP(g *gin.Context) {
 	// 通过请求实例化分页结构体
 	page := pagination.NewFromRequest(g)
-	keywords := g.Query("keywords")
-	ipType, _ := strconv.Atoi(g.DefaultQuery("type", "1"))
-	page = c.ipManageService.GetIPWithPagination(page, ipType, keywords)
+	query := g.Query("query")
+	isBlack := g.DefaultQuery("isBlack", "false")
+	var isBlackBool bool
+	if isBlack == "true" {
+		isBlackBool = true
+	} else {
+		isBlackBool = false
+	}
+	page = c.ipManageService.GetIPWithPagination(page, isBlackBool, query)
 	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "success", Data: page})
 }
 
@@ -87,7 +92,7 @@ func (c *IPManageController) DeleteIP(g *gin.Context) {
 		return
 	}
 
-	err := c.ipManageService.DeleteIP(req.IP, req.Type)
+	err := c.ipManageService.DeleteIP(req.IP, req.IsBlack)
 	if err != nil {
 		g.Error(err)
 		return

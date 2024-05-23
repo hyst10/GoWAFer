@@ -1,6 +1,7 @@
 {
   "type": "page",
-  "title": "xss攻击防护规则",
+  "title": "白名单",
+  "remark": "当路径为白名单路径时将跳过后续安全检查。",
   "toolbar": [
     {
       "type": "button",
@@ -9,16 +10,21 @@
       "icon": "fa fa-plus pull-left",
       "primary": true,
       "dialog": {
-        "title": "新增规则",
+        "title": "新增白名单路由",
         "body": {
           "type": "form",
-          "mode": "horizontal",
-          "api": "post:/waf/api/v1/xssDetect",
+          "api": "post:/waf/api/v1/routing",
           "body": [
             {
               "type": "input-text",
-              "name": "rule",
-              "label": "防护规则",
+              "name": "path",
+              "label": "路径",
+              "required": true
+            },
+            {
+              "type": "hidden",
+              "name": "isBlack",
+              "value": false,
               "required": true
             }
           ]
@@ -29,18 +35,14 @@
   "body": [
     {
       "type": "crud",
-      "api": "/waf/api/v1/xssDetect",
+      "api": "/waf/api/v1/routing?page=${page}&perPage=${perPage}&query=${query}&isBlack=false",
       "defaultParams": {
-        "perPage": 10
+        "perPage": 20
       },
       "headerToolbar": [
         "statistics",
         "switch-per-page",
-        {
-          "type": "export-csv",
-          "label": "导出规则",
-          "filename": "xssDetectRules"
-        },
+        "export-excel",
         {
           "type": "pagination",
           "align": "right"
@@ -52,17 +54,28 @@
         "pagination"
       ],
       "syncLocation": false,
-      "loadDataOnce": true,
+      "autoFillHeight": true,
+      "autoGenerateFilter": {
+        "columnsNum": 3,
+        "showBtnToolbar": false,
+        "defaultCollapsed": false
+      },
       "columns": [
         {
-          "label": "防护规则",
-          "name": "rule",
-          "type": "tpl",
-          "tpl": "<div style='background-color: #f2f4f8; padding: 5px; border-radius: 4px; text-align: center;'>${rule}</div>"
+          "label": "路径",
+          "name": "path",
+          "copyable": true,
+          "searchable": {
+            "type": "input-text",
+            "name": "query",
+            "label": "路径",
+            "placeholder": "通过路径查询"
+          }
         },
         {
           "type": "operation",
           "label": "操作",
+          "width": "200px",
           "fixed": "right",
           "buttons": [
             {
@@ -75,9 +88,10 @@
               "confirmText": "确认要删除?",
               "api": {
                 "method": "delete",
-                "url": "/waf/api/v1/xssDetect",
+                "url": "/waf/api/v1/routing",
                 "data": {
-                  "rule": "${rule}"
+                  "path": "${path}",
+                  "isBlack": false
                 }
               }
             }

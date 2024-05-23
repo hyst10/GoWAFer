@@ -144,16 +144,15 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "关键词",
-                        "name": "keywords",
+                        "description": "查询关键字",
+                        "name": "query",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "IP类型",
-                        "name": "type",
-                        "in": "query",
-                        "required": true
+                        "description": "是否为黑名单",
+                        "name": "isBlack",
+                        "in": "query"
                     },
                     {
                         "type": "integer",
@@ -277,8 +276,26 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "查询IP",
-                        "name": "keywords",
+                        "description": "ip搜索",
+                        "name": "ip",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "封禁原因搜索",
+                        "name": "block_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "HTTP方法搜索",
+                        "name": "method",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "日期排序",
+                        "name": "orderDir",
                         "in": "query"
                     },
                     {
@@ -317,16 +334,15 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "关键词",
-                        "name": "keywords",
+                        "description": "查询关键字",
+                        "name": "query",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "路由类型",
-                        "name": "type",
-                        "in": "query",
-                        "required": true
+                        "description": "是否为黑名单",
+                        "name": "isBlack",
+                        "in": "query"
                     },
                     {
                         "type": "integer",
@@ -709,8 +725,7 @@ var doc = `{
         "types.AddIPRequest": {
             "type": "object",
             "required": [
-                "ip",
-                "type"
+                "ip"
             ],
             "properties": {
                 "expiration": {
@@ -719,27 +734,22 @@ var doc = `{
                 "ip": {
                     "type": "string"
                 },
-                "type": {
-                    "type": "integer"
+                "isBlack": {
+                    "type": "boolean"
                 }
             }
         },
         "types.AddRoutingRequest": {
             "type": "object",
             "required": [
-                "method",
-                "routing",
-                "type"
+                "path"
             ],
             "properties": {
-                "method": {
-                    "type": "string"
+                "isBlack": {
+                    "type": "boolean"
                 },
-                "routing": {
+                "path": {
                     "type": "string"
-                },
-                "type": {
-                    "type": "integer"
                 }
             }
         },
@@ -757,34 +767,28 @@ var doc = `{
         "types.DeleteIPRequest": {
             "type": "object",
             "required": [
-                "ip",
-                "type"
+                "ip"
             ],
             "properties": {
                 "ip": {
                     "type": "string"
                 },
-                "type": {
-                    "type": "integer"
+                "isBlack": {
+                    "type": "boolean"
                 }
             }
         },
         "types.DeleteRoutingRequest": {
             "type": "object",
             "required": [
-                "method",
-                "routing",
-                "type"
+                "path"
             ],
             "properties": {
-                "method": {
-                    "type": "string"
+                "isBlack": {
+                    "type": "boolean"
                 },
-                "routing": {
+                "path": {
                     "type": "string"
-                },
-                "type": {
-                    "type": "integer"
                 }
             }
         },
@@ -832,7 +836,7 @@ type swaggerInfo struct {
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
-	Version:     "v0.1",
+	Version:     "v1.0",
 	Host:        "",
 	BasePath:    "",
 	Schemes:     []string{},

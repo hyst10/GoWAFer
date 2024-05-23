@@ -9,12 +9,12 @@ type IPInfo struct {
 // AddIPRequest 添加IP记录请求
 type AddIPRequest struct {
 	IP         string `json:"ip" binding:"required"`
-	Type       int    `json:"type" binding:"required"`
+	IsBlack    bool   `json:"isBlack"`
 	Expiration int    `json:"expiration"`
 }
 
 // DeleteIPRequest 删除IP记录请求
 type DeleteIPRequest struct {
-	IP   string `json:"ip" binding:"required"`
-	Type int    `json:"type" binding:"required"`
+	IP      string `json:"ip" binding:"required"`
+	IsBlack bool   `json:"isBlack"`
 }

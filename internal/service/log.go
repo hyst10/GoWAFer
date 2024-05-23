@@ -63,12 +63,10 @@ func (c *LogService) FindLogs(days, hours int) api_helper.LogStatsResponse {
 	// 填充数据到时间分组
 	for _, item := range items {
 		key := item.CreatedAt.Format(timeFormat)
-		// 根据状态码计数
-		switch item.Status {
-		case 200:
-			counts200[key]++
-		case 403:
+		if item.BlockBy != "" {
 			counts403[key]++
+		} else {
+			counts200[key]++
 		}
 	}
 
@@ -81,8 +79,8 @@ func (c *LogService) FindLogs(days, hours int) api_helper.LogStatsResponse {
 	return response
 }
 
-func (c *LogService) FindPaginatedLogs(page *pagination.Pages, keyword string) *pagination.Pages {
-	items, count := c.logRepository.FindPaginated(page.Page, page.PerPage, keyword)
+func (c *LogService) FindPaginatedLogs(page *pagination.Pages, query map[string]interface{}, order string) *pagination.Pages {
+	items, count := c.logRepository.FindPaginated(page.Page, page.PerPage, query, order)
 	page.Items = items
 	page.Total = count
 	return page

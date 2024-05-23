@@ -1,17 +1,13 @@
 package repository
 
 import (
+	"GoWAFer/constants"
 	"GoWAFer/internal/types"
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"strings"
 	"time"
-)
-
-const (
-	blackIPKey = "blackIPList" // 黑名单IP
-	whiteIPKey = "whiteIPList" // 白名单IP
 )
 
 // IPManageRepository IP管理仓库接口
@@ -28,60 +24,52 @@ func NewIPManageRepository(rdb *redis.Client) *IPManageRepository {
 	}
 }
 
-// 生成key
-func generateIPKey(rType int) string {
-	switch rType {
-	case 1:
-		return blackIPKey
-	case 2:
-		return whiteIPKey
-	default:
-		return blackIPKey
+func chooseKeyHeader(isBlack bool) string {
+	if isBlack {
+		return constants.BlackIPKey
 	}
+	return constants.WhiteIPKey
 }
 
 // Add 新增一条IP管理记录，设置过期时间储存到redis中
-func (r *IPManageRepository) Add(ip string, expiration, ipType int) error {
-	key := fmt.Sprintf("%s:%s", generateIPKey(ipType), ip)
-	duration := time.Duration(expiration) * time.Second
-	return r.rdb.Set(r.ctx, key, 1, duration).Err()
+func (r *IPManageRepository) Add(ip string, expiration int, isBlack bool) error {
+	key := fmt.Sprintf("%s:%s", chooseKeyHeader(isBlack), ip)
+	return r.rdb.Set(r.ctx, key, 1, time.Duration(expiration)*time.Second).Err()
 }
 
 // Del 删除一条IP管理记录
-func (r *IPManageRepository) Del(ip string, ipType int) error {
-	key := fmt.Sprintf("%s:%s", generateIPKey(ipType), ip)
+func (r *IPManageRepository) Del(ip string, isBlack bool) error {
+	key := fmt.Sprintf("%s:%s", chooseKeyHeader(isBlack), ip)
 	return r.rdb.Del(r.ctx, key).Err()
 }
 
 // GetAllWithPagination 分页查询IP管理记录，并查询生存时间
-func (r *IPManageRepository) GetAllWithPagination(page, pageSize, ipType int, keywords string) ([]types.IPInfo, int) {
-	keyHeader := generateIPKey(ipType)
+func (r *IPManageRepository) GetAllWithPagination(page, pageSize int, isBlack bool, query string) ([]types.IPInfo, int) {
 	startIndex := (page - 1) * pageSize
 	endIndex := startIndex + pageSize - 1
-	var keys []string
+	var ips []string
 	var count int
-	// 获取集合中所有成员
-	if keywords != "" {
-		keys, _ = r.rdb.Keys(r.ctx, fmt.Sprintf("%s:*%s*", keyHeader, keywords)).Result()
+	if query != "" {
+		ips, _ = r.rdb.Keys(r.ctx, fmt.Sprintf("%s:*%s*", chooseKeyHeader(isBlack), query)).Result()
 	} else {
-		keys, _ = r.rdb.Keys(r.ctx, fmt.Sprintf("%s:*", keyHeader)).Result()
+		ips, _ = r.rdb.Keys(r.ctx, chooseKeyHeader(isBlack)+":*").Result()
 	}
-	count = len(keys)
+	count = len(ips)
 
-	// 检查索引
+	// 设置索引
 	if startIndex >= count {
-		keys = []string{}
+		ips = []string{}
 	} else {
 		endIndex = startIndex + pageSize
 		if endIndex > count {
 			endIndex = count
 		}
-		keys = keys[startIndex:endIndex]
+		ips = ips[startIndex:endIndex]
 	}
 
-	ipInfos := make([]types.IPInfo, 0)
-	for _, key := range keys {
-		ttlResult := r.rdb.TTL(r.ctx, key).Val()
+	infos := make([]types.IPInfo, 0)
+	for _, item := range ips {
+		ttlResult := r.rdb.TTL(r.ctx, item).Val()
 		expirationStr := ""
 		if ttlResult == -1 {
 			expirationStr = "永久"
@@ -89,22 +77,30 @@ func (r *IPManageRepository) GetAllWithPagination(page, pageSize, ipType int, ke
 			expiration := time.Now().Add(ttlResult)
 			expirationStr = expiration.Format("2006-01-02 15:04:05")
 		}
-		parts := strings.Split(key, ":")
-		ipInfo := types.IPInfo{
-			IP:         parts[1],
-			Expiration: expirationStr,
-		}
-		ipInfos = append(ipInfos, ipInfo)
+		parts := strings.Split(item, ":")
+		info := types.IPInfo{IP: parts[1], Expiration: expirationStr}
+		infos = append(infos, info)
 	}
-	return ipInfos, count
+	return infos, count
 }
 
 // IsExist 判断IP记录是否存在
-func (r *IPManageRepository) IsExist(ip string, ipType int) (bool, error) {
-	key := fmt.Sprintf("%s:%s", generateIPKey(ipType), ip)
+func (r *IPManageRepository) IsExist(ip string) string {
+	key := fmt.Sprintf("%s:%s", constants.WhiteIPKey, ip)
 	result, err := r.rdb.Exists(r.ctx, key).Result()
 	if err != nil {
-		return false, err
+		return ""
 	}
-	return result == 1, nil
+	if result == 1 {
+		return constants.WhiteIPKey
+	}
+	key = fmt.Sprintf("%s:%s", constants.BlackIPKey, ip)
+	result, err = r.rdb.Exists(r.ctx, key).Result()
+	if err != nil {
+		return ""
+	}
+	if result == 1 {
+		return constants.BlackIPKey
+	}
+	return ""
 }

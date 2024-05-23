@@ -18,16 +18,17 @@ type Admin struct {
 
 // Log 日志模型
 type Log struct {
-	ID          uint          `gorm:"primarykey" json:"id"`
-	ClientIP    string        `json:"clientIP"`  // 客户端IP
-	Method      string        `json:"method"`    // http方法
-	Url         string        `json:"url"`       // 完整的请求url
-	UserAgent   string        `json:"userAgent"` // ua头
-	Referer     string        `json:"referer"`   // 来源页面
-	ContentType string        `json:"contentType"`
-	BlockBy     string        `json:"blockBy"`
-	BlockReason string        `json:"blockReason"`
-	Latency     time.Duration `json:"latency"`
-	Status      int           `json:"status"`
-	CreatedAt   time.Time     `json:"createdAt"`
+	ID          uint      `gorm:"primarykey;autoIncrement" json:"id"`
+	IP          string    `gorm:"size:200;not null" json:"ip"`    // 客户端IP
+	Method      string    `gorm:"size:50;not null" json:"method"` // 请求方法
+	Path        string    `gorm:"size:255;not null" json:"path"`  // 请求路径
+	Query       string    `gorm:"size:255"  json:"query"`         // 请求参数
+	Body        string    `gorm:"type:text" json:"body"`          // 请求体
+	UserAgent   string    `gorm:"size:255" json:"userAgent"`      // 请求头
+	Referer     string    `gorm:"size:255" json:"referer"`        // 请求来源
+	Status      int       `gorm:"not null" json:"status"`         // 状态码
+	Latency     int64     `gorm:"not null" json:"latency"`        // 耗时(毫秒)
+	BlockBy     string    `gorm:"size:50" json:"blockBy"`         // 拦截中间件
+	BlockReason string    `gorm:"size:255" json:"blockReason"`    // 拦截原因
+	CreatedAt   time.Time `gorm:"not null" json:"createdAt"`      // 请求时间
 }

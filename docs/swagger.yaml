@@ -101,24 +101,19 @@ definitions:
         type: integer
       ip:
         type: string
-      type:
-        type: integer
+      isBlack:
+        type: boolean
     required:
     - ip
-    - type
     type: object
   types.AddRoutingRequest:
     properties:
-      method:
+      isBlack:
+        type: boolean
+      path:
         type: string
-      routing:
-        type: string
-      type:
-        type: integer
     required:
-    - method
-    - routing
-    - type
+    - path
     type: object
   types.AddSqlInjectRuleRequest:
     properties:
@@ -131,24 +126,19 @@ definitions:
     properties:
       ip:
         type: string
-      type:
-        type: integer
+      isBlack:
+        type: boolean
     required:
     - ip
-    - type
     type: object
   types.DeleteRoutingRequest:
     properties:
-      method:
+      isBlack:
+        type: boolean
+      path:
         type: string
-      routing:
-        type: string
-      type:
-        type: integer
     required:
-    - method
-    - routing
-    - type
+    - path
     type: object
   types.DeleteSqlInjectRuleRequest:
     properties:
@@ -174,7 +164,7 @@ info:
   description: Golang编写的一款基于反向代理模式的web防火墙应用 By supercat0867
   license: {}
   title: GoWAFer
-  version: v0.1
+  version: v1.0
 paths:
   /waf/api/v1/auth/dologin:
     post:
@@ -268,14 +258,13 @@ paths:
     get:
       description: 分页查询IP管理记录
       parameters:
-      - description: 关键词
+      - description: 查询关键字
         in: query
-        name: keywords
+        name: query
         type: string
-      - description: IP类型
+      - description: 是否为黑名单
         in: query
-        name: type
-        required: true
+        name: isBlack
         type: string
       - description: 页码
         in: query
@@ -336,9 +325,21 @@ paths:
     get:
       description: 分页查询被拦截的流量日志
       parameters:
-      - description: 查询IP
+      - description: ip搜索
         in: query
-        name: keywords
+        name: ip
+        type: string
+      - description: 封禁原因搜索
+        in: query
+        name: block_by
+        type: string
+      - description: HTTP方法搜索
+        in: query
+        name: method
+        type: string
+      - description: 日期排序
+        in: query
+        name: orderDir
         type: string
       - description: 页码
         in: query
@@ -381,14 +382,13 @@ paths:
     get:
       description: 分页查询路由管理记录
       parameters:
-      - description: 关键词
+      - description: 查询关键字
         in: query
-        name: keywords
+        name: query
         type: string
-      - description: 路由类型
+      - description: 是否为黑名单
         in: query
-        name: type
-        required: true
+        name: isBlack
         type: string
       - description: 页码
         in: query

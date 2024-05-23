@@ -1,6 +1,6 @@
 {
   "type": "page",
-  "title": "IP黑名单管理",
+  "title": "黑名单",
   "toolbar": [
     {
       "type": "button",
@@ -18,19 +18,20 @@
               "type": "input-text",
               "name": "ip",
               "label": "IP",
+              "placeholder": "输入正确的IP格式",
               "required": true
             },
             {
               "type": "hidden",
-              "name": "type",
-              "value": 1,
+              "name": "isBlack",
+              "value": true,
               "required": true
             },
             {
               "type": "input-number",
               "name": "expiration",
               "label": "TTL",
-              "labelRemark": "生存时间，单位为秒",
+              "suffix": "秒",
               "required": true
             }
           ]
@@ -41,9 +42,9 @@
   "body": [
     {
       "type": "crud",
-      "api": "/waf/api/v1/ip?page=${page}&perPage=${perPage}&keywords=${keywords}&type=1",
+      "api": "/waf/api/v1/ip?page=${page}&perPage=${perPage}&query=${query}&isBlack=true",
       "defaultParams": {
-        "perPage": 10
+        "perPage": 20
       },
       "headerToolbar": [
         "statistics",
@@ -60,40 +61,23 @@
         "pagination"
       ],
       "syncLocation": false,
-      "filter": {
-        "title": "条件搜索",
-        "body": [
-          {
-            "type": "group",
-            "body": [
-              {
-                "type": "input-text",
-                "name": "keywords",
-                "label": "关键词",
-                "clearable": true,
-                "placeholder": "通过关键词搜索",
-                "size": "lg"
-              }
-            ]
-          }
-        ],
-        "actions": [
-          {
-            "type": "reset",
-            "label": "重置"
-          },
-          {
-            "type": "submit",
-            "level": "primary",
-            "label": "查询"
-          }
-        ]
+      "autoFillHeight": true,
+      "autoGenerateFilter": {
+        "columnsNum": 3,
+        "showBtnToolbar": false,
+        "defaultCollapsed": false
       },
       "columns": [
         {
           "label": "IP",
           "name": "ip",
-          "copyable": true
+          "copyable": true,
+          "searchable": {
+            "type": "input-text",
+            "name": "query",
+            "label": "IP",
+            "placeholder": "输入IP查询"
+          }
         },
         {
           "label": "过期时间",
@@ -117,7 +101,7 @@
                 "url": "/waf/api/v1/ip",
                 "data": {
                   "ip": "${ip}",
-                  "type": 1
+                  "isBlack": true
                 }
               }
             }

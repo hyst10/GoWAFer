@@ -60,14 +60,14 @@
                             "redirect": "/waf/app/blackIP",
                             "children": [
                                 {
-                                    "label": "IP黑名单",
+                                    "label": "黑名单",
                                     "url": "/waf/app/blackIP",
-                                    "schemaApi": "/waf/pages/blackIPPage"
+                                    "schemaApi": "/waf/pages/blackIP"
                                 },
                                 {
-                                    "label": "IP白名单",
+                                    "label": "白名单",
                                     "url": "/waf/app/whiteIP",
-                                    "schemaApi": "/waf/pages/whiteIPPage"
+                                    "schemaApi": "/waf/pages/whiteIP"
                                 }
                             ]
                         }
@@ -76,21 +76,21 @@
                 {
                     "children": [
                         {
-                            "label": "路由守卫",
+                            "label": "路径管理",
                             "url": "/waf/app/menu/routing",
                             "icon": "fa-solid fa-road",
                             "vendor": "",
-                            "redirect": "/waf/app/blackRoutingList",
+                            "redirect": "/waf/app/blackPath",
                             "children": [
                                 {
-                                    "label": "路由黑名单",
-                                    "url": "/waf/app/blackRoutingList",
-                                    "schemaApi": "/waf/pages/blackRoutingPage"
+                                    "label": "黑名单",
+                                    "url": "/waf/app/blackPath",
+                                    "schemaApi": "/waf/pages/blackPath"
                                 },
                                 {
-                                    "label": "路由白名单",
-                                    "url": "/waf/app/whiteRoutingList",
-                                    "schemaApi": "/waf/pages/whiteRoutingPage"
+                                    "label": "白名单",
+                                    "url": "/waf/app/whitePath",
+                                    "schemaApi": "/waf/pages/whitePath"
                                 }
                             ]
                         }
@@ -110,7 +110,7 @@
                 {
                     "children": [
                         {
-                            "label": "SQL注入防御",
+                            "label": "SQL注入",
                             "url": "/waf/app/menu/sqlInjection",
                             "icon": "fa-solid fa-database",
                             "vendor": "",
@@ -121,7 +121,7 @@
                 {
                     "children": [
                         {
-                            "label": "XSS攻击防御",
+                            "label": "XSS攻击",
                             "url": "/waf/app/menu/xssDetect",
                             "icon": "fa-solid fa-code",
                             "vendor": "",
@@ -143,7 +143,7 @@
                 {
                     "children": [
                         {
-                            "label": "waf运行配置",
+                            "label": "系统配置",
                             "url": "/waf/app/menu/config",
                             "icon": "fa-solid fa-gears",
                             "vendor": "",

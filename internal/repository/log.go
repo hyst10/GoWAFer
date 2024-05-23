@@ -35,19 +35,20 @@ func (r *LogRepository) FindLog(days, hours int) []model.Log {
 
 	var logs []model.Log
 
-	r.db.Where(" CreatedAt >= ?", startTime).Find(&logs)
+	r.db.Where("CreatedAt >= ?", startTime).Find(&logs)
 
 	return logs
 }
 
 // FindPaginated 分页查询被拦截的流量日志
-func (r *LogRepository) FindPaginated(pageIndex, pageSize int, keyword string) ([]model.Log, int) {
-	var logs []model.Log
+func (r *LogRepository) FindPaginated(page, pageSize int, query map[string]interface{}, order string) ([]*model.Log, int) {
+	var logs []*model.Log
 	var count int64
-	query := r.db.Model(&model.Log{}).Order("CreatedAt DESC").Where("Status = ?", 403)
-	if keyword != "" {
-		query = query.Where("ClientIP LIKE ?", fmt.Sprintf("%%%s%%", keyword))
+	sql := r.db.Model(&model.Log{}).Order("CreatedAt " + order).
+		Where("BlockBy IS NOT NULL AND BlockBy <> ''")
+	for k, v := range query {
+		sql = sql.Where(k+" LIKE ?", fmt.Sprintf("%%%s%%", v))
 	}
-	query.Count(&count).Limit(pageSize).Offset((pageIndex - 1) * pageSize).Find(&logs)
+	sql.Count(&count).Limit(pageSize).Offset((page - 1) * pageSize).Find(&logs)
 	return logs, int(count)
 }

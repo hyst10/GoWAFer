@@ -3,7 +3,6 @@ package middleware
 import (
 	"GoWAFer/internal/repository"
 	"GoWAFer/pkg/config"
-	"GoWAFer/pkg/utils/api_helper"
 	"github.com/gin-gonic/gin"
 	"sync"
 	"time"
@@ -14,11 +13,6 @@ var ipLimiters = make(map[string]RLInterface)
 
 func RateLimitMiddleware(conf *config.Config, repo *repository.IPManageRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// 检查是否为白名单IP
-		if skip, _ := c.Get("isWhiteListIP"); skip == true {
-			c.Next()
-			return
-		}
 		// 获取客户端IP
 		clientIP := c.ClientIP()
 		// 给限速实例map加锁
@@ -33,7 +27,7 @@ func RateLimitMiddleware(conf *config.Config, repo *repository.IPManageRepositor
 		if !limiter.Allow(clientIP, conf, repo) {
 			c.Set("BlockedBy", "CC攻击防护中间件")
 			c.Set("BlockReason", "客户端IP访问频率过高")
-			api_helper.ForbiddenHandler(c, "访问过于频繁，请稍后再试！")
+			c.HTML(200, "block.html", gin.H{"Reason": "访问过于频繁，请稍后再试！"})
 			c.Abort()
 			return
 		}
@@ -50,13 +44,13 @@ func (rl *TokenBucket) Allow(ip string, conf *config.Config, rep *repository.IPM
 	// 检查计数器是否超过最大值
 	if rl.Counter > conf.RateLimiter.MaxCounter {
 		// 将IP拉入永久黑名单
-		rep.Add(ip, 0, 1)
+		rep.Add(ip, 0, true)
 		rl.Counter = 0
 		return false
 	}
 	if rl.Counter > conf.RateLimiter.BanCounter {
 		// 将IP封禁一段时间
-		rep.Add(ip, conf.RateLimiter.BanDuration, 1)
+		rep.Add(ip, conf.RateLimiter.BanDuration, true)
 		rl.Counter = 0
 		return false
 	}
@@ -90,13 +84,13 @@ func (rl *LeakyBucket) Allow(ip string, conf *config.Config, rep *repository.IPM
 	// 检查计数器是否超过最大值
 	if rl.Counter > conf.RateLimiter.MaxCounter {
 		// 将IP拉入永久黑名单
-		rep.Add(ip, 0, 1)
+		rep.Add(ip, 0, true)
 		rl.Counter = 0
 		return false
 	}
 	if rl.Counter > conf.RateLimiter.BanCounter {
 		// 将IP封禁一段时间
-		rep.Add(ip, conf.RateLimiter.BanDuration, 1)
+		rep.Add(ip, conf.RateLimiter.BanDuration, true)
 		rl.Counter = 0
 		return false
 	}
@@ -134,13 +128,13 @@ func (rl *FixedWindow) Allow(ip string, conf *config.Config, rep *repository.IPM
 	// 检查计数器是否超过最大值
 	if rl.Counter > conf.RateLimiter.MaxCounter {
 		// 将IP拉入永久黑名单
-		rep.Add(ip, 0, 1)
+		rep.Add(ip, 0, true)
 		rl.Counter = 0
 		return false
 	}
 	if rl.Counter > conf.RateLimiter.BanCounter {
 		// 将IP封禁一段时间
-		rep.Add(ip, conf.RateLimiter.BanDuration, 1)
+		rep.Add(ip, conf.RateLimiter.BanDuration, true)
 		rl.Counter = 0
 		return false
 	}
@@ -169,13 +163,13 @@ func (rl *SlidingWindow) Allow(ip string, conf *config.Config, rep *repository.I
 	// 检查计数器是否超过最大值
 	if rl.Counter > conf.RateLimiter.MaxCounter {
 		// 将IP拉入永久黑名单
-		rep.Add(ip, 0, 1)
+		rep.Add(ip, 0, true)
 		rl.Counter = 0
 		return false
 	}
 	if rl.Counter > conf.RateLimiter.BanCounter {
 		// 将IP封禁一段时间
-		rep.Add(ip, conf.RateLimiter.BanDuration, 1)
+		rep.Add(ip, conf.RateLimiter.BanDuration, true)
 		rl.Counter = 0
 		return false
 	}

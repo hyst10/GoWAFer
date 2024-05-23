@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"log"
 	"net/http"
 	"os"
@@ -26,25 +27,34 @@ import (
 
 // @title GoWAFer
 // @description Golang编写的一款基于反向代理模式的web防火墙应用 By supercat0867
-// @version v0.1
+// @version v1.0
 func main() {
 	graceful.Welcome()
 
 	// 读取配置文章
 	conf := config.ReadConfig()
-	log.Println("配置文件加载成功")
+	fmt.Println("配置文件加载成功")
+
+	// 配置日志输出
+	log.SetOutput(&lumberjack.Logger{
+		Filename:   "log/application.log",
+		MaxSize:    10,
+		MaxBackups: 3,
+		MaxAge:     28,
+		Compress:   true,
+	})
 
 	// 创建数据库连接
 	db, err := database.InitDB()
 	if err != nil {
 		panic(fmt.Sprintf("数据库连接失败：%v", err))
 	}
-	log.Println("数据库连接成功")
+	fmt.Println("数据库连接成功")
 	rdb := database.InitRedis()
 
 	// 迁移数据库
 	migrate.AutoMigrateAndInsertData(db)
-	log.Println("数据库迁移成功")
+	fmt.Println("数据库迁移成功")
 
 	r := gin.Default()
 

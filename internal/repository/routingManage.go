@@ -1,16 +1,12 @@
 package repository
 
 import (
+	"GoWAFer/constants"
 	"GoWAFer/internal/types"
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"strings"
-)
-
-const (
-	blackRoutingKey = "blackRoutingList" // 黑名单路由
-	whiteRoutingKey = "whiteRoutingList" // 白名单路由
 )
 
 // RoutingManageRepository 路由管理仓库接口
@@ -27,62 +23,54 @@ func NewRoutingManageRepository(rdb *redis.Client) *RoutingManageRepository {
 	}
 }
 
-// 生成key
-func generateRoutingKey(rType int) string {
-	switch rType {
-	case 1:
-		return blackRoutingKey
-	case 2:
-		return whiteRoutingKey
-	default:
-		return blackRoutingKey
+func choosePathKeyHeader(isBlack bool) string {
+	if isBlack {
+		return constants.BlackPathKey
 	}
+	return constants.WhitePathKey
 }
 
 // Add 新增一条路由管理记录，设置过期时间储存到redis中
-func (r *RoutingManageRepository) Add(routing, method string, routingType int) error {
-	key := fmt.Sprintf("%s:%s:%s", generateRoutingKey(routingType), routing, method)
+func (r *RoutingManageRepository) Add(path string, isBlack bool) error {
+	key := fmt.Sprintf("%s:%s", choosePathKeyHeader(isBlack), path)
 	return r.rdb.Set(r.ctx, key, 1, 0).Err()
 }
 
 // Del 删除一条路由管理记录
-func (r *RoutingManageRepository) Del(routing, method string, routingType int) error {
-	key := fmt.Sprintf("%s:%s:%s", generateRoutingKey(routingType), routing, method)
+func (r *RoutingManageRepository) Del(path string, isBlack bool) error {
+	key := fmt.Sprintf("%s:%s", choosePathKeyHeader(isBlack), path)
 	return r.rdb.Del(r.ctx, key).Err()
 }
 
 // GetAllWithPagination 分页查询路由管理记录
-func (r *RoutingManageRepository) GetAllWithPagination(page, pageSize, routingType int, keywords string) ([]types.RouteInfo, int) {
-	keyHeader := generateRoutingKey(routingType)
+func (r *RoutingManageRepository) GetAllWithPagination(page, pageSize int, isBlack bool, query string) ([]types.RouteInfo, int) {
 	startIndex := (page - 1) * pageSize
 	endIndex := startIndex + pageSize - 1
-	var keys []string
+	var paths []string
 	var count int
-	// 获取集合中所有成员
-	if keywords != "" {
-		keys, _ = r.rdb.Keys(r.ctx, fmt.Sprintf("%s:*%s*", keyHeader, keywords)).Result()
+	if query != "" {
+		paths, _ = r.rdb.Keys(r.ctx, fmt.Sprintf("%s:*%s*", choosePathKeyHeader(isBlack), query)).Result()
 	} else {
-		keys, _ = r.rdb.Keys(r.ctx, fmt.Sprintf("%s:*", keyHeader)).Result()
+		paths, _ = r.rdb.Keys(r.ctx, choosePathKeyHeader(isBlack)+":*").Result()
 	}
-	count = len(keys)
+	count = len(paths)
 
-	// 检查索引
+	// 设置索引
 	if startIndex >= count {
-		keys = []string{}
+		paths = []string{}
 	} else {
 		endIndex = startIndex + pageSize
 		if endIndex > count {
 			endIndex = count
 		}
-		keys = keys[startIndex:endIndex]
+		paths = paths[startIndex:endIndex]
 	}
 
 	routeInfos := make([]types.RouteInfo, 0)
-	for _, key := range keys {
+	for _, key := range paths {
 		parts := strings.Split(key, ":")
 		routeInfo := types.RouteInfo{
-			Routing: parts[1],
-			Method:  parts[2],
+			Path: parts[1],
 		}
 		routeInfos = append(routeInfos, routeInfo)
 	}
@@ -90,11 +78,22 @@ func (r *RoutingManageRepository) GetAllWithPagination(page, pageSize, routingTy
 }
 
 // IsExist 判断路由记录是否存在
-func (r *RoutingManageRepository) IsExist(routing, method string, routingType int) (bool, error) {
-	key := fmt.Sprintf("%s:%s:%s", generateRoutingKey(routingType), routing, method)
+func (r *RoutingManageRepository) IsExist(path string) string {
+	key := fmt.Sprintf("%s:%s", constants.WhitePathKey, path)
 	result, err := r.rdb.Exists(r.ctx, key).Result()
 	if err != nil {
-		return false, err
+		return ""
 	}
-	return result == 1, nil
+	if result == 1 {
+		return constants.WhitePathKey
+	}
+	key = fmt.Sprintf("%s:%s", constants.BlackPathKey, path)
+	result, err = r.rdb.Exists(r.ctx, key).Result()
+	if err != nil {
+		return ""
+	}
+	if result == 1 {
+		return constants.BlackPathKey
+	}
+	return ""
 }

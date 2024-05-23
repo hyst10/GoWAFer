@@ -4,10 +4,12 @@
   "body": [
     {
       "type": "crud",
-      "api": "/waf/api/v1/log/getBlockLog?page=${page}&perPage=${perPage}&keywords=${keywords}",
+      "api": "/waf/api/v1/log/getBlockLog?page=${page}&perPage=${perPage}&ip=${ip}&method=${method}&orderDir=${orderDir}",
       "interval": 3000,
+      "autoFillHeight": true,
       "defaultParams": {
-        "perPage": 10
+        "perPage": 20,
+        "orderDir": "desc"
       },
       "headerToolbar": [
         "statistics",
@@ -24,116 +26,134 @@
         "pagination"
       ],
       "syncLocation": false,
-      "filter": {
-        "title": "条件搜索",
-        "body": [
-          {
-            "type": "group",
-            "body": [
+      "autoGenerateFilter": {
+        "columnsNum": 3,
+        "showBtnToolbar": false,
+        "defaultCollapsed": false
+      },
+      "columns": [
+        {
+          "name": "id",
+          "label": "ID"
+        },
+        {
+          "label": "IP",
+          "name": "ip",
+          "copyable": true,
+          "searchable": {
+            "type": "input-text",
+            "name": "ip",
+            "label": "IP",
+            "placeholder": "输入IP查询"
+          }
+        },
+        {
+          "label": "Date",
+          "name": "createdAt",
+          "type": "date",
+          "format": "YYYY-MM-DD HH:mm:ss",
+          "sortable": true
+        },
+        {
+          "label": "Method",
+          "name": "method",
+          "type": "mapping",
+          "map": {
+            "default": "<span class='label' style='background-color: #ff5252; color: white;'>*</span>",
+            "GET": "<span class='label' style='background-color: #2196f3; color: white;'>GET</span>",
+            "POST": "<span class='label' style='background-color: #4caf50; color: white;'>POST</span>",
+            "PUT": "<span class='label' style='background-color: #ff9800; color: white;'>PUT</span>",
+            "DELETE": "<span class='label' style='background-color: #f44336; color: white;'>DELETE</span>",
+            "OPTIONS": "<span class='label' style='background-color: #673ab7; color: white;'>OPTIONS</span>",
+            "HEAD": "<span class='label' style='background-color: #9e9e9e; color: white;'>HEAD</span>",
+            "PATCH": "<span class='label' style='background-color: #ff5722; color: white;'>PATCH</span>",
+            "TRACE": "<span class='label' style='background-color: #ffc107; color: white;'>TRACE</span>"
+          },
+          "searchable": {
+            "type": "select",
+            "name": "method",
+            "label": "Method",
+            "placeholder": "输入Method查询",
+            "options": [
               {
-                "type": "input-text",
-                "name": "keywords",
-                "label": "IP",
-                "clearable": true,
-                "placeholder": "通过IP搜索",
-                "size": "sm"
+                "label": "GET ",
+                "value": "GET"
+              },
+              {
+                "label": "POST",
+                "value": "POST"
+              },
+              {
+                "label": "PUT",
+                "value": "PUT"
+              },
+              {
+                "label": "DELETE",
+                "value": "DELETE"
+              },
+              {
+                "label": "PATCH",
+                "value": "PATCH"
+              },
+              {
+                "label": "HEAD",
+                "value": "HEAD"
+              },
+              {
+                "label": "OPTIONS",
+                "value": "OPTIONS"
+              },
+              {
+                "label": "TRACE",
+                "value": "TRACE"
               }
             ]
           }
-        ],
-        "actions": [
-          {
-            "type": "reset",
-            "label": "重置"
-          },
-          {
-            "type": "submit",
-            "level": "primary",
-            "label": "查询"
-          }
-        ]
-      },
-      "tableLayout": "fixed",
-      "columns": [
-        {
-          "label": "发生时间",
-          "name": "createdAt",
-          "type": "date",
-          "format": "YYYY年MM月DD日 HH时mm分ss秒",
-          "width": 100
         },
         {
-          "label": "客户端IP",
-          "name": "clientIP",
-          "width": 50,
-          "copyable": true
-        },
-        {
-          "label": "Url",
-          "name": "url",
-          "width": 80,
+          "label": "Path",
+          "name": "path",
           "type": "tpl",
-          "tpl": "${url.length > 50 ? TRUNCATE(url,50) : url}"
-        },
-        {
-          "name": "method",
-          "label": "Method",
-          "type": "mapping",
-          "map": {
-            "GET": "<span class='label label-info'>GET</span>",
-            "POST": "<span class='label label-success'>POST</span>",
-            "PUT": "<span class='label label-warning'>PUT</span>",
-            "DELETE": "<span class='label label-danger'>DELETE</span>"
-          },
-          "width": 50
+          "tpl": "${path.length > 50 ? TRUNCATE(path,50) : path}"
         },
         {
           "label": "拦截中间件",
-          "name": "blockBy",
-          "width": 50
+          "name": "blockBy"
         },
         {
           "label": "拦截原因",
           "name": "blockReason",
-          "width": 50
+          "type": "tpl",
+          "tpl": "${blockReason.length > 50 ? TRUNCATE(blockReason,50) : blockReason}"
         },
         {
           "type": "operation",
           "label": "操作",
           "fixed": "right",
-          "width": 100,
           "buttons": [
             {
               "type": "button",
-              "icon": "fa fa-eye",
+              "label": "查看详情",
               "actionType": "dialog",
-              "tooltip": "查看",
+              "level": "link",
               "dialog": {
-                "title": "查看",
+                "title": "日志详情",
                 "body": {
                   "type": "form",
                   "body": [
                     {
-                      "type": "static-date",
-                      "name": "createdAt",
-                      "format": "YYYY年MM月DD日 HH时mm分ss秒",
-                      "label": "发生时间"
-                    },
-                    {
-                      "type": "divider"
-                    },
-                    {
                       "type": "static",
-                      "name": "clientIP",
+                      "name": "ip",
                       "label": "IP"
                     },
                     {
                       "type": "divider"
                     },
                     {
-                      "type": "static",
-                      "name": "url",
-                      "label": "Url"
+                      "type": "static-date",
+                      "name": "createdAt",
+                      "format": "YYYY-MM-DD HH:mm:ss",
+                      "label": "Date"
                     },
                     {
                       "type": "divider"
@@ -142,6 +162,30 @@
                       "type": "static",
                       "name": "method",
                       "label": "Method"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "path",
+                      "label": "Path"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "query",
+                      "label": "Query"
+                    },
+                    {
+                      "type": "divider"
+                    },
+                    {
+                      "type": "static",
+                      "name": "body",
+                      "label": "Body"
                     },
                     {
                       "type": "divider"
@@ -163,12 +207,21 @@
                       "type": "divider"
                     },
                     {
-                      "type": "static",
-                      "name": "contentType",
-                      "label": "ContentType"
+                      "label": "Latency",
+                      "name": "latency",
+                      "type": "static-tpl",
+                      "tpl": "${latency} ms"
                     }
                   ]
-                }
+                },
+                "actions": [
+                  {
+                    "type": "button",
+                    "label": "关闭",
+                    "level": "primary",
+                    "actionType": "close"
+                  }
+                ]
               }
             }
           ]

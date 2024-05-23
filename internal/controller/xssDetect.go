@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"GoWAFer/constants"
 	"GoWAFer/internal/service"
 	"GoWAFer/internal/types"
 	"GoWAFer/pkg/utils/api_helper"
@@ -42,7 +43,7 @@ func (c *XssDetectController) CreateRule(g *gin.Context) {
 	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "操作成功！"})
 
 	go func() {
-		types.XssDetectRules[regexp.MustCompile(req.Rule)] = true
+		constants.XssDetectRules[regexp.MustCompile(req.Rule)] = true
 	}()
 }
 
@@ -87,6 +88,6 @@ func (c *XssDetectController) DeleteRule(g *gin.Context) {
 	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "操作成功！"})
 
 	go func() {
-		delete(types.XssDetectRules, regexp.MustCompile(req.Rule))
+		delete(constants.XssDetectRules, regexp.MustCompile(req.Rule))
 	}()
 }

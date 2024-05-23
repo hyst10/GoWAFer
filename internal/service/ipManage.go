@@ -16,18 +16,18 @@ func NewIPManageService(r *repository.IPManageRepository) *IPManageService {
 }
 
 // AddIP 添加一条IP记录
-func (c *IPManageService) AddIP(ip string, expiration, ipType int) error {
-	return c.ipManageRepository.Add(ip, expiration, ipType)
+func (s *IPManageService) AddIP(ip string, expiration int, isBlack bool) error {
+	return s.ipManageRepository.Add(ip, expiration, isBlack)
 }
 
 // DeleteIP 删除一条IP记录
-func (c *IPManageService) DeleteIP(ip string, ipType int) error {
-	return c.ipManageRepository.Del(ip, ipType)
+func (s *IPManageService) DeleteIP(ip string, isBlack bool) error {
+	return s.ipManageRepository.Del(ip, isBlack)
 }
 
 // GetIPWithPagination 分页查询路由管理记录
-func (c *IPManageService) GetIPWithPagination(page *pagination.Pages, ipType int, keyword string) *pagination.Pages {
-	items, count := c.ipManageRepository.GetAllWithPagination(page.Page, page.PerPage, ipType, keyword)
+func (s *IPManageService) GetIPWithPagination(page *pagination.Pages, isBlack bool, query string) *pagination.Pages {
+	items, count := s.ipManageRepository.GetAllWithPagination(page.Page, page.PerPage, isBlack, query)
 	page.Items = items
 	page.Total = count
 	return page

@@ -47,15 +47,27 @@ func (c *LogController) FindLogs(g *gin.Context) {
 // @Description 分页查询被拦截的流量日志
 // @Tags Log（日志模块）
 // @Produce json
-// @Param keywords query string false "查询IP"
+// @Param ip query string false "ip搜索"
+// @Param block_by query string false "封禁原因搜索"
+// @Param method query string false "HTTP方法搜索"
+// @Param orderDir query string false "日期排序"
 // @Param page query int false "页码"
 // @Param perPage query int false "页面大小"
 // @Success 200 {object} api_helper.Response
 // @Router /waf/api/v1/log/getBlockLog [get]
 func (c *LogController) FindPaginatedBlockedLog(g *gin.Context) {
-	// 通过请求实例化分页结构体
+	ip := g.Query("ip")
+	blockBy := g.Query("block_by")
+	method := g.Query("method")
+	order := g.DefaultQuery("orderDir", "desc")
+
+	query := map[string]interface{}{
+		"ip":      ip,
+		"BlockBy": blockBy,
+		"Method":  method,
+	}
+
 	page := pagination.NewFromRequest(g)
-	keyword := g.Query("keywords")
-	page = c.logService.FindPaginatedLogs(page, keyword)
+	page = c.logService.FindPaginatedLogs(page, query, order)
 	g.JSON(http.StatusOK, api_helper.Response{Status: 0, Msg: "success", Data: page})
 }

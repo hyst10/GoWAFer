@@ -16,18 +16,18 @@ func NewRoutingManageService(r *repository.RoutingManageRepository) *RoutingMana
 }
 
 // AddRouting 添加一条路由记录
-func (c *RoutingManageService) AddRouting(routing, method string, routingType int) error {
-	return c.routingManageRepository.Add(routing, method, routingType)
+func (c *RoutingManageService) AddRouting(path string, isBlack bool) error {
+	return c.routingManageRepository.Add(path, isBlack)
 }
 
 // DeleteRouting 删除一条路由记录
-func (c *RoutingManageService) DeleteRouting(routing, method string, routingType int) error {
-	return c.routingManageRepository.Del(routing, method, routingType)
+func (c *RoutingManageService) DeleteRouting(path string, isBlack bool) error {
+	return c.routingManageRepository.Del(path, isBlack)
 }
 
 // GetRoutingWithPagination 分页查询路由管理记录
-func (c *RoutingManageService) GetRoutingWithPagination(page *pagination.Pages, routerType int, keyword string) *pagination.Pages {
-	items, count := c.routingManageRepository.GetAllWithPagination(page.Page, page.PerPage, routerType, keyword)
+func (c *RoutingManageService) GetRoutingWithPagination(page *pagination.Pages, isBlack bool, query string) *pagination.Pages {
+	items, count := c.routingManageRepository.GetAllWithPagination(page.Page, page.PerPage, isBlack, query)
 	page.Items = items
 	page.Total = count
 	return page

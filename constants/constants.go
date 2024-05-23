@@ -1,18 +1,24 @@
-package types
+package constants
 
 import "regexp"
 
+const (
+	BlackIPKey   = "blackIPList"
+	WhiteIPKey   = "whiteIPList"
+	BlackPathKey = "blackPath"
+	WhitePathKey = "whitePath"
+	SqlInjectKey = "sqlInjectRules"
+	XssDetectKey = "xssDetectRules"
+)
+
 var SqlInjectRules = map[*regexp.Regexp]bool{
-	regexp.MustCompile("(?i)(union)(.*)(select)"): true,
-	regexp.MustCompile("(?i)select(.*)from"):      true,
-	regexp.MustCompile("(?i)insert into"):         true,
-	regexp.MustCompile("(?i)delete from"):         true,
-	regexp.MustCompile("(?i)drop table"):          true,
-	regexp.MustCompile("(?i)update(.*)set"):       true,
-	regexp.MustCompile("--"):                      true,
-	regexp.MustCompile("(\\b|\\')(OR|or|oR|Or)('|\\b)\\s*('\\d+'|'\\d+'--\\s*|'\\d+'(\\s+)(--)?|\\d+)(\\s+)(=|like)(\\s+)(\\b|\\')\\d+('|\\b)"): true,
-	regexp.MustCompile("/\\*.*\\*/"): true,
-	regexp.MustCompile(";"):          true,
+	regexp.MustCompile(`(?i)\bunion\b.*\bselect\b`):     true,
+	regexp.MustCompile(`(?i)\bselect\b.*\bfrom\b`):      true,
+	regexp.MustCompile(`(?i)\binsert\s+into\b`):         true,
+	regexp.MustCompile(`(?i)\bdelete\s+from\b`):         true,
+	regexp.MustCompile(`(?i)\bdrop\s+table\b`):          true,
+	regexp.MustCompile(`(?i)\bupdate\b.*\bset\b`):       true,
+	regexp.MustCompile(`(?i)=\d+\s+(or|and)\s+\d+=\d+`): true,
 }
 var XssDetectRules = map[*regexp.Regexp]bool{
 	regexp.MustCompile("javascript:[^\\\\s]*"):                                   true,
